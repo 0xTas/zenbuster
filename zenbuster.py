@@ -119,8 +119,7 @@ except ImportError:
             try:
                 import subprocess
                 subprocess.call(['python3','-m','pip','install','requests'])
-                from site import getusersitepackages
-                user_site = getusersitepackages()
+                from site import getusersitepackages as user_site
 
                 # Dynamically import packages that have been installed 
                 # at runtime by appending them to our path
@@ -160,8 +159,7 @@ except ImportError:
             subprocess.call(['python3','-m','pip','install','termcolor'])
 
             # Solution from: https://stackoverflow.com/questions/56974185/import-runtime-installed-module-using-pip-in-python-3
-            from site import getusersitepackages 
-            user_site = getusersitepackages()
+            from site import getusersitepackages as user_site
 
             if user_site not in path:
                 path.append(user_site)
@@ -189,14 +187,13 @@ if platform.system() == 'Windows':
                     import subprocess
                     subprocess.call(['python3','-m','pip','install',
                                     'colorama'])
-                    from site import getusersitepackages
-                    user_site = getusersitepackages()
+                    from site import getusersitepackages as user_site
 
                     # Dynamically import packages that have been installed 
                     # by appending them to our path at runtime.
                     if user_site not in path:  
                         path.append(user_site)
-                    from colorama import init
+                    from colorama import init, deinit
                     sleep(2)
                 except Exception as err:
                     print(f'{err}\n\n Could not import module Colorama, script will not output color..')
