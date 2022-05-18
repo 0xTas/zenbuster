@@ -233,7 +233,7 @@ def clearScreen() -> None:
     os.system('cls') if platform.system() == 'Windows' else os.system('clear')
 
 
-def zeroX(hexx) -> bool:
+def zeroX(hexx: int) -> bool:
     try:
         hexxx = hex(hexx)[2:]
         hexxxx = hex(hexx)[:2].encode().hex()
@@ -539,9 +539,8 @@ if not state['dry_run'] and not state['assistance']:
             die(1)
 
 
-    if state['host_bool']:
-        pass
-    else:
+    if not state['host_bool']:
+
         if state['no_color']:
             try:
                 host = input(' [?] Input Target Host: ')  
@@ -608,50 +607,49 @@ def printBanner() -> None:
         else:
             print(' Directory Mode                       URL Enumerator By: 0xTas')
         print('-----------------------------------------------------------------')
-    else:
-        if state['lolcat']:
-            banner_file = open('zenBanner.txt','w')
-            banner_file.write(rngBanner())
-            banner_file.close()
+    elif state['lolcat']:
+        banner_file = open('zenBanner.txt','w')
+        banner_file.write(rngBanner())
+        banner_file.close()
 
-            # Not using subprocess because I'd need shell=True for chained/piped commands,
-            # And at that point it's practically just os.system anyway.
-            os.system('lolcat zenBanner.txt; rm zenBanner.txt')
-            print()
-            if state['assistance']:
-                os.system('echo " Assistance Mode                      URL Enumerator By: 0xTas" | lolcat')
-            elif not state['directory_mode']:
-                os.system('echo " Subdomain Mode                       URL Enumerator By: 0xTas" | lolcat')
-            else:
-                os.system('echo " Directory Mode                       URL Enumerator By: 0xTas" | lolcat')
-            os.system('echo "-----------------------------------------------------------------" | lolcat')
+        # Not using subprocess because I'd need shell=True for chained/piped commands,
+        # And at that point it's practically just os.system anyway.
+        os.system('lolcat zenBanner.txt; rm zenBanner.txt')
+        print()
+        if state['assistance']:
+            os.system('echo " Assistance Mode                      URL Enumerator By: 0xTas" | lolcat')
+        elif not state['directory_mode']:
+            os.system('echo " Subdomain Mode                       URL Enumerator By: 0xTas" | lolcat')
         else:
-            # Initialize color output if on Windows
-            if platform.system() == 'Windows' and not state['no_color']: init()
-            print(colored(rngBanner(),f'{rngColor()}'))
+            os.system('echo " Directory Mode                       URL Enumerator By: 0xTas" | lolcat')
+        os.system('echo "-----------------------------------------------------------------" | lolcat')
+    else:
+        # Initialize color output if on Windows
+        if platform.system() == 'Windows' and not state['no_color']: init()
+        print(colored(rngBanner(),f'{rngColor()}'))
 
-            if state['assistance']:
-                print(colored(' Assistance Mode                        URL Enumerator By: ',rngColor())
-                    +colored('0','blue',attrs=['bold'])
-                    +colored('x','magenta',attrs=['bold'])
-                    +colored('T','green')
-                    +colored('a','cyan')
-                    +colored('s','red'))
-            elif not state['directory_mode']:
-                print(colored(' Subdomain Mode                         URL Enumerator By: ',rngColor())
-                    +colored('0','blue',attrs=['bold'])
-                    +colored('x','magenta',attrs=['bold'])
-                    +colored('T','green',attrs=['bold'])
-                    +colored('a','cyan',attrs=['bold'])
-                    +colored('s','red',attrs=['bold']))
-            else:
-                print(colored(' Directory Mode                         URL Enumerator By: ',rngColor())
-                    +colored('0','blue',attrs=['bold'])
-                    +colored('x','magenta',attrs=['bold'])
-                    +colored('T','green',attrs=['bold'])
-                    +colored('a','cyan',attrs=['bold'])
-                    +colored('s','red',attrs=['bold']))
-            print(colored('-----------------------------------------------------------------',rngColor()))
+        if state['assistance']:
+            print(colored(' Assistance Mode                        URL Enumerator By: ',rngColor())
+                +colored('0','blue',attrs=['bold'])
+                +colored('x','magenta',attrs=['bold'])
+                +colored('T','green')
+                +colored('a','cyan')
+                +colored('s','red'))
+        elif state['directory_mode']:
+            print(colored(' Directory Mode                         URL Enumerator By: ',rngColor())
+                +colored('0','blue',attrs=['bold'])
+                +colored('x','magenta',attrs=['bold'])
+                +colored('T','green')
+                +colored('a','cyan')
+                +colored('s','red'))
+        else:
+            print(colored(' Subdomain Mode                         URL Enumerator By: ',rngColor())
+                +colored('0','blue',attrs=['bold'])
+                +colored('x','magenta',attrs=['bold'])
+                +colored('T','green')
+                +colored('a','cyan')
+                +colored('s','red'))
+        print(colored('-----------------------------------------------------------------',rngColor()))
 
 
 ####################################
@@ -697,7 +695,7 @@ def enumSubdomains(enumerator:str) -> None:
             with lock:
                 if not state['quiet']:
                     if state['no_color']:
-                        print(f' [+] Subdomain Found: {enum_item} | Status: ({r.status_code}).         ')
+                        print(f' [+] Subdomain Found: {enum_item} | Status: ({r.status_code})          ')
                     else:
                         print(colored(' [','blue',attrs=['bold'])
                             +colored('+','green',attrs=['bold'])
@@ -706,7 +704,7 @@ def enumSubdomains(enumerator:str) -> None:
                             +colored(f'{enum_item}','cyan',attrs=['bold','underline'])
                             +' | Status: ('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
-                            +').              ')
+                            +')               ')
                 if r.history:
                     enumerated.append(f'{enum_item} | Status: ({r.history[0].status_code})')
                 else:
@@ -715,6 +713,7 @@ def enumSubdomains(enumerator:str) -> None:
 
 def enumDirectories(enumerator:str) -> None:
     # Enumerate directory/file/resource for host with enumerator from wordlist (+extensions).
+    # Append valid endpoints to enumerated list.
     global enumerated
     if exiting.is_set(): return
 
@@ -746,19 +745,19 @@ def enumDirectories(enumerator:str) -> None:
 
         r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
     except:
-        return
+        pass
     else:
         if r.status_code in ignored_codes:
-            return
+            pass
         else:
             with lock:
                 if not state['quiet']:
                     if state['no_color']:
                         if r.history:
                             print('[+] Endpoint Found: ',end='')
-                            print(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}).')
+                            print(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})  ')
                         else:
-                            print(f' [+] Endpoint Found: {enum_item} | Status: ({r.status_code}).         ')
+                            print(f' [+] Endpoint Found: {enum_item} | Status: ({r.status_code})          ')
                     else:
                         if r.history:
                             print(colored(' [','blue',attrs=['bold'])
@@ -770,7 +769,7 @@ def enumDirectories(enumerator:str) -> None:
                                 +colored(' -> ',rngColor())
                                 +colored(f'{r.history[-1].url}','cyan',attrs=['bold','underline'])
                                 +' | Status: ('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+').')
+                                +colored(f'{r.status_code}','green',attrs=['bold'])+')  ')
                         else:
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
@@ -778,7 +777,7 @@ def enumDirectories(enumerator:str) -> None:
                                 +' Endpoint Found: '
                                 +colored(f'{enum_item}','cyan',attrs=['bold','underline'])
                                 +' | Status: ('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+').              ')   
+                                +colored(f'{r.status_code}','green',attrs=['bold'])+')               ')   
      
                 if r.history:
                     enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
@@ -813,9 +812,9 @@ def enumDirectories(enumerator:str) -> None:
                                 if state['no_color']:
                                     if r.history:
                                         print('[+] Endpoint Found: ',end='')
-                                        print(f'{enum_item}.{ext} | Status: ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}).')
+                                        print(f'{enum_item}.{ext} | Status: ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})  ')
                                     else:
-                                        print(f' [+] Endpoint Found: {enum_item}.{ext} | Status: ({r.status_code}).            ')
+                                        print(f' [+] Endpoint Found: {enum_item}.{ext} | Status: ({r.status_code})             ')
                                 else:
                                     if r.history:
                                         print(colored(' [','blue',attrs=['bold'])
@@ -827,7 +826,7 @@ def enumDirectories(enumerator:str) -> None:
                                             +colored(' -> ',rngColor())
                                             +colored(f'{r.history[-1].url}','cyan',attrs=['bold','underline'])
                                             +' | Status: ('
-                                            +colored(f'{r.status_code}','green',attrs=['bold'])+').')
+                                            +colored(f'{r.status_code}','green',attrs=['bold'])+')  ')
                                     else:
                                         print(colored(' [','blue',attrs=['bold'])
                                             +colored('+','green',attrs=['bold'])
@@ -836,7 +835,7 @@ def enumDirectories(enumerator:str) -> None:
                                             +colored(f'{enum_item}.{ext}','cyan',
                                             attrs=['bold','underline'])+' | Status: ('
                                             +colored(f'{r.status_code}','green',
-                                            attrs=['bold'])+').        ')
+                                            attrs=['bold'])+')         ')
 
                             if r.history:
                                 enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
@@ -903,9 +902,7 @@ def zenBuster() -> None:
     # Catch KeyboardInterrupt if desired, or display results when finished.
     if not state['quiet']: printBanner()
     if state['assistance']: return zenHelp()
-    if state['dry_run']: 
-        print(ignored_codes)
-        return die(0)
+    if state['dry_run']: return die(0)
 
     try:
         start_time = datetime.now()
@@ -920,8 +917,7 @@ def zenBuster() -> None:
 
             with ThreadPoolExecutor() as executor:
                 try:
-                    futures = [executor.submit(enumDirectories, enumerator) 
-                            for enumerator in enumerator_list]
+                    futures = [executor.submit(enumDirectories, enumerator) for enumerator in enumerator_list]
                     for future in futures:
                         future.add_done_callback(taskProgress)
                     while tasks_complete < list_length:
