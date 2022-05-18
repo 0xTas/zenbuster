@@ -159,7 +159,8 @@ except ImportError:
             subprocess.call(['python3','-m','pip','install','termcolor'])
 
             # Solution from: https://stackoverflow.com/questions/56974185/import-runtime-installed-module-using-pip-in-python-3
-            from site import getusersitepackages as user_site
+            from site import getusersitepackages
+            user_site = getusersitepackages()
 
             if user_site not in path:
                 path.append(user_site)
@@ -187,8 +188,9 @@ if platform.system() == 'Windows':
                     import subprocess
                     subprocess.call(['python3','-m','pip','install',
                                     'colorama'])
-                    from site import getusersitepackages as user_site
+                    from site import getusersitepackages
 
+                    user_site = getusersitepackages()
                     # Dynamically import packages that have been installed 
                     # by appending them to our path at runtime.
                     if user_site not in path:  
