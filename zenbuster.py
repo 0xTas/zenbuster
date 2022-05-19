@@ -244,7 +244,10 @@ def zeroX(hexx: int) -> bool:
 
 
 def validateHost(hostname:str) -> bool:
-    global state, host # Modifies "ssl" state flag, also "host".
+    # Checks validity of given host, with support for both
+    # ipv4 and ipv6 formatting, plus auto SSL detection.
+    # Modifies "ssl" state flag, also "host".
+    global state, host 
     print(' Validating Host...')
     try:
         if hostname.startswith('https'): state['ssl'] = True
@@ -344,6 +347,7 @@ def zenHelp() -> None:
 
 
 def logResults(results: list, mode: str, host: str, filename: str) -> bool:
+    # Logs contents of the enumerated results list to a file
     log_time = datetime.now()
     try:
         with open(f'{filename}','a') as log_file:
@@ -432,8 +436,8 @@ port = None
 enumerated = []
 tasks_complete = 0
 lock = threading.Lock()
-ignored_codes = [c for c in range(500,600)]; ignored_codes.append(404)
 if log_filename == None: log_filename = 'zenResults.log'
+ignored_codes = [c for c in range(500,600)]; ignored_codes.append(404)
 headers = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
 
 # Defaults to interactive mode to populate host/wordlist if not correctly supplied up-front.
@@ -586,6 +590,7 @@ if not state['dry_run'] and not state['assistance']:
 #        Print Banner         #
 ###############################
 def printBanner() -> None:
+    # Prints a banner based on configured color options.
     global state # Modifies "lolcat" state flag.
     if platform.system() == 'Linux':
         import subprocess
@@ -602,26 +607,24 @@ def printBanner() -> None:
 
         if state['assistance']:
             print(' Assistance Mode                      URL Enumerator By: 0xTas')
-        elif not state['directory_mode']:
-            print(' Subdomain Mode                       URL Enumerator By: 0xTas')
-        else:
+        elif state['directory_mode']:
             print(' Directory Mode                       URL Enumerator By: 0xTas')
+        else:
+            print(' Subdomain Mode                       URL Enumerator By: 0xTas')
         print('-----------------------------------------------------------------')
     elif state['lolcat']:
         banner_file = open('zenBanner.txt','w')
         banner_file.write(rngBanner())
         banner_file.close()
 
-        # Not using subprocess because I'd need shell=True for chained/piped commands,
-        # And at that point it's practically just os.system anyway.
         os.system('lolcat zenBanner.txt; rm zenBanner.txt')
         print()
         if state['assistance']:
             os.system('echo " Assistance Mode                      URL Enumerator By: 0xTas" | lolcat')
-        elif not state['directory_mode']:
-            os.system('echo " Subdomain Mode                       URL Enumerator By: 0xTas" | lolcat')
-        else:
+        elif state['directory_mode']:
             os.system('echo " Directory Mode                       URL Enumerator By: 0xTas" | lolcat')
+        else:
+            os.system('echo " Subdomain Mode                       URL Enumerator By: 0xTas" | lolcat')
         os.system('echo "-----------------------------------------------------------------" | lolcat')
     else:
         # Initialize color output if on Windows
@@ -656,8 +659,8 @@ def printBanner() -> None:
 #         Enum Functions           #
 ####################################
 def enumSubdomains(enumerator:str) -> None:
-    # Enumerate subdomain for host with enumerator from wordlist.
-    # Append valid hosts to enumerated list 
+    # Enumerates subdomain for target with enumerator from wordlist.
+    # Appends valid subdomains to enumerated list. 
     global enumerated
     if exiting.is_set(): return
 
@@ -712,8 +715,8 @@ def enumSubdomains(enumerator:str) -> None:
 
 
 def enumDirectories(enumerator:str) -> None:
-    # Enumerate directory/file/resource for host with enumerator from wordlist (+extensions).
-    # Append valid endpoints to enumerated list.
+    # Enumerates directory/file/resource for target with enumerator from wordlist (+extensions).
+    # Appends valid endpoints to enumerated list.
     global enumerated
     if exiting.is_set(): return
 
@@ -784,6 +787,7 @@ def enumDirectories(enumerator:str) -> None:
                 else:
                     enumerated.append(f'{enum_item} | Status: ({r.status_code})')
 
+    # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
             for ext in extensions:
                 try:
@@ -843,7 +847,8 @@ def enumDirectories(enumerator:str) -> None:
                                 enumerated.append(f'{enum_item}.{ext} | Status: ({r.status_code})')
 
 def taskProgress(future) -> None:
-    # Track and report progress for each task in the thread pool.
+    # Tracks and reports progress for each task in the thread pool.
+    # Prints numerical progress if not verbose mode
     global tasks_complete
     if state['verbose'] or exiting.is_set():
         with lock:
@@ -898,8 +903,8 @@ def taskProgress(future) -> None:
 #      Main Function      #
 ###########################
 def zenBuster() -> None:
-    # Populate thread pool, and await completion of the tasks. 
-    # Catch KeyboardInterrupt if desired, or display results when finished.
+    # Populates the thread pool, and awaits completion of the tasks. 
+    # Catches KeyboardInterrupt if desired, and displays the results when finished.
     if not state['quiet']: printBanner()
     if state['assistance']: return zenHelp()
     if state['dry_run']: return die(0)
