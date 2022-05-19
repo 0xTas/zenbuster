@@ -123,7 +123,7 @@ except ImportError:
 
                 # Dynamically import packages that have been installed 
                 # at runtime by appending them to our path
-                if user_site not in path:  
+                if user_site not in path:
                     path.append(user_site)
                 import requests
                 sleep(2)
@@ -144,7 +144,7 @@ except ImportError:
 ##############################
 #      Initialize Color      #
 ##############################
-if '-nc' in args or '--no-color' in args:
+if '-nc' in args or '--no-color' in map(str.lower, args):
     state['no_color'] = True
 
 os.system('cls') if platform.system() == 'Windows' else os.system('clear')
@@ -175,36 +175,36 @@ except ImportError:
         state['no_color'] = True
         sleep(4.20)
 
-if platform.system() == 'Windows':
+# Windows terminal requires initialization via Colorama module to display color.
+if platform.system() == 'Windows' and not state['no_color']:
 
-    if not state['no_color']:
-        try:
-            from colorama import init, deinit
-        except ImportError:
-            cont = input('\n Colorama module is not installed, would you like to install it now?  [Y/N]: ')
+    try:
+        from colorama import init, deinit
+    except ImportError:
+        cont = input('\n Colorama module is not installed, would you like to install it now?  [Y/N]: ')
 
-            if cont.lower() == 'y': 
-                try:
-                    import subprocess
-                    subprocess.call(['python3','-m','pip','install',
-                                    'colorama'])
-                    from site import getusersitepackages
+        if cont.lower() == 'y': 
+            try:
+                import subprocess
+                subprocess.call(['python3','-m','pip','install',
+                                'colorama'])
+                from site import getusersitepackages
 
-                    user_site = getusersitepackages()
-                    # Dynamically import packages that have been installed 
-                    # by appending them to our path at runtime.
-                    if user_site not in path:  
-                        path.append(user_site)
-                    from colorama import init, deinit
-                    sleep(2)
-                except Exception as err:
-                    print(f'{err}\n\n Could not import module Colorama, script will not output color..')
-                    state['no_color'] = True
-                    sleep(4.20)
-            else:
-                print(f' Could not import module Colorama, script will not output color..')
+                user_site = getusersitepackages()
+                # Dynamically import packages that have been installed 
+                # by appending them to our path at runtime.
+                if user_site not in path:  
+                    path.append(user_site)
+                from colorama import init, deinit
+                sleep(2)
+            except Exception as err:
+                print(f'{err}\n\n Could not import module Colorama, script will not output color..')
                 state['no_color'] = True
                 sleep(4.20)
+        else:
+            print(f' Could not import module Colorama, script will not output color..')
+            state['no_color'] = True
+            sleep(4.20)
 os.system('cls') if platform.system() == 'Windows' else os.system('clear')
 
 
@@ -952,8 +952,7 @@ def zenBuster() -> None:
                     +colored(f'{host}',rngColor())+'\n')
             with ThreadPoolExecutor() as executor:
                 try:
-                    futures = [executor.submit(enumSubdomains, enumerator) 
-                            for enumerator in enumerator_list]
+                    futures = [executor.submit(enumSubdomains, enumerator) for enumerator in enumerator_list]
                     for future in futures:
                         future.add_done_callback(taskProgress)
                     while tasks_complete < list_length:
