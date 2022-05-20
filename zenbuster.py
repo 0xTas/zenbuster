@@ -698,7 +698,7 @@ def enumSubdomains(enumerator:str) -> None:
             with lock:
                 if not state['quiet']:
                     if state['no_color']:
-                        print(f' [+] Subdomain Found: {enum_item} | Status: ({r.status_code})         ')
+                        print(f' [+] Subdomain Found: {enum_item} | Status: ({r.status_code})    ')
                     else:
                         print(colored(' [','blue',attrs=['bold'])
                             +colored('+','green',attrs=['bold'])
@@ -707,7 +707,7 @@ def enumSubdomains(enumerator:str) -> None:
                             +colored(f'{enum_item}','cyan',attrs=['bold','underline'])
                             +' | Status: ('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
-                            +')              ')
+                            +')    ')
                 if r.history:
                     enumerated.append(f'{enum_item} | Status: ({r.history[0].status_code})')
                 else:
@@ -760,7 +760,7 @@ def enumDirectories(enumerator:str) -> None:
                             print('[+] Endpoint Found: ',end='')
                             print(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}) ')
                         else:
-                            print(f' [+] Endpoint Found: {enum_item} | Status: ({r.status_code})         ')
+                            print(f' [+] Endpoint Found: {enum_item} | Status: ({r.status_code})    ')
                     else:
                         if r.history:
                             print(colored(' [','blue',attrs=['bold'])
@@ -780,7 +780,7 @@ def enumDirectories(enumerator:str) -> None:
                                 +' Endpoint Found: '
                                 +colored(f'{enum_item}','cyan',attrs=['bold','underline'])
                                 +' | Status: ('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+')              ')   
+                                +colored(f'{r.status_code}','green',attrs=['bold'])+')         ')   
      
                 if r.history:
                     enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
@@ -818,7 +818,7 @@ def enumDirectories(enumerator:str) -> None:
                                         print('[+] Endpoint Found: ',end='')
                                         print(f'{enum_item}.{ext} | Status: ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}) ')
                                     else:
-                                        print(f' [+] Endpoint Found: {enum_item}.{ext} | Status: ({r.status_code})             ')
+                                        print(f' [+] Endpoint Found: {enum_item}.{ext} | Status: ({r.status_code})        ')
                                 else:
                                     if r.history:
                                         print(colored(' [','blue',attrs=['bold'])
@@ -839,7 +839,7 @@ def enumDirectories(enumerator:str) -> None:
                                             +colored(f'{enum_item}.{ext}','cyan',
                                             attrs=['bold','underline'])+' | Status: ('
                                             +colored(f'{r.status_code}','green',
-                                            attrs=['bold'])+')        ')
+                                            attrs=['bold'])+')   ')
 
                             if r.history:
                                 enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
@@ -935,11 +935,10 @@ def zenBuster() -> None:
                         print(colored('\n [','yellow',attrs=['bold'])
                             +colored('!','red',attrs=['bold'])
                             +colored(']','yellow',attrs=['bold'])+' Caught '
-                            +colored('KeyboardInterrupt','yellow',
-                            attrs=['bold'])+'. '+colored('[','yellow',
-                            attrs=['bold'])+colored('!','red',
-                            attrs=['bold'])+colored(']                      ','yellow',
-                            attrs=['bold']))
+                            +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. '
+                            +colored('[','yellow',attrs=['bold'])
+                            +colored('!','red',attrs=['bold'])
+                            +colored(']                      ','yellow',attrs=['bold']))
                         print(colored(' Preparing to Exit..                  ','red'))
                     executor.shutdown(wait=False,cancel_futures=True)
                     if state['no_color']:
@@ -968,13 +967,12 @@ def zenBuster() -> None:
                         print('\n [!] Caught KeyboardInterrupt. [!]          \n Preparing to Exit..                  ')
                     else:
                         print(colored('\n [','yellow',attrs=['bold'])
-                            +colored('!','red',attrs=['bold'])+colored(']',
-                            'yellow',attrs=['bold'])+' Caught '
-                            +colored('KeyboardInterrupt','yellow',
-                            attrs=['bold'])+'. '+colored('[','yellow',
-                            attrs=['bold'])+colored('!','red',
-                            attrs=['bold'])+colored(']                      ','yellow',
-                            attrs=['bold']))
+                            +colored('!','red',attrs=['bold'])
+                            +colored(']','yellow',attrs=['bold'])+' Caught '
+                            +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. '
+                            +colored('[','yellow',attrs=['bold'])
+                            +colored('!','red',attrs=['bold'])
+                            +colored(']                      ','yellow',attrs=['bold']))
                         print(colored(' Preparing to Exit..                  ','red'))
                     executor.shutdown(wait=False,cancel_futures=True)
                     if state['no_color']:
