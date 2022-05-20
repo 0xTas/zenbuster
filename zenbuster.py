@@ -186,8 +186,7 @@ if platform.system() == 'Windows' and not state['no_color']:
         if cont.lower() == 'y': 
             try:
                 import subprocess
-                subprocess.call(['python3','-m','pip','install',
-                                'colorama'])
+                subprocess.call(['python3','-m','pip','install','colorama'])
                 from site import getusersitepackages
 
                 user_site = getusersitepackages()
@@ -246,7 +245,7 @@ def zeroX(hexx: int) -> bool:
 def validateHost(hostname:str) -> bool:
     # Checks validity of given host, with support for both
     # ipv4 and ipv6 formatting, plus auto SSL detection.
-    # Modifies "ssl" state flag, also "host".
+    # Modifies "ssl" state flag, also "host", depending on given format.
     global state, host 
     print(' Validating Host...')
     try:
@@ -347,7 +346,8 @@ def zenHelp() -> None:
 
 
 def logResults(results: list, mode: str, host: str, filename: str) -> bool:
-    # Logs contents of the enumerated results list to a file
+    # Logs contents of the enumerated results list to a file,
+    # returns True if successful and False if exception occurs.
     log_time = datetime.now()
     try:
         with open(f'{filename}','a') as log_file:
@@ -385,7 +385,10 @@ for i in range(1,len(args)):
 
     if args[i] == '-x' or args[i].lower() == '--ext':
         state['extension_bool'] = True
-        extensions = args[i+1].split(',')
+        if i == (len(args)-1) or args[i+1].startswith('-'):
+            extensions = []
+        else:
+            extensions = args[i+1].split(',')
     elif args[i] == '-s' or args[i].lower() == '--ssl':
         state['ssl'] = True
     elif args[i] == '-d' or args[i].lower() == '--dirs':
@@ -393,28 +396,37 @@ for i in range(1,len(args)):
     elif args[i] == '-h' or args[i].lower() == '--help':
         state['assistance'] = True
     elif args[i] == '-u' or args[i].lower() == '--host':
-        host = args[i+1]
-        state['host_bool'] = validateHost(host)
+        if i == (len(args)-1) or args[i+1].startswith('-'):
+            state['host_bool'] = False
+        else:
+            host = args[i+1]
+            state['host_bool'] = validateHost(host)
     elif args[i] == '-p' or args[i].lower() == '--port':
-        try:
-            port = args[i+1]
-            if int(port) not in range(1,65536):
-                print(f' Invalid Port Number: {port}! \nFalling back to defaults..')
+        if i == (len(args)-1) or args[i+1].startswith('-'):
+            port = None
+        else:
+            try:
+                port = args[i+1]
+                if int(port) not in range(1,65536):
+                    print(f' Invalid Port Number: {port}! \nFalling back to defaults..')
+                    port = None
+                    sleep(2)
+                    clearScreen()
+            except ValueError:
+                print(f' Provided port: {port} is not a valid integer!\n Falling back to defaults..')
                 port = None
                 sleep(2)
                 clearScreen()
-        except ValueError:
-            print(f' Provided port: {port} is not a valid integer!\n Falling back to defaults..')
-            port = None
-            sleep(2)
-            clearScreen()
     elif args[i] == '-v' or args[i].lower() == '--verbose':
         state['verbose'] = True
     elif args[i] == '-dr' or args[i].lower() == '--dry-run':
         state['dry_run'] = True
     elif args[i] == '-w' or args[i].lower() == '--wordlist':
-        wordlist = open(f'{args[i+1]}',encoding='latin-1').read()
-        state['wordlist_bool'] = True
+        if i == (len(args)-1) or args[i+1].startswith('-'):
+            state['wordlist_bool'] = False
+        else:
+            wordlist = open(f'{args[i+1]}',encoding='latin-1').read()
+            state['wordlist_bool'] = True
     elif args[i] == '-nr' or args[i].lower() == '--no-rainbow':
         state['no_lolcat'] = True
     elif args[i] == '-O' or args[i].lower() == '--out-file':
@@ -429,9 +441,9 @@ for i in range(1,len(args)):
         state['debug'] = True
 
 
-###############################
-#     Define Critical Data    #
-###############################
+################################
+#    Defining Critical Data    #
+################################
 port = None
 enumerated = []
 tasks_complete = 0
@@ -478,10 +490,10 @@ if not state['dry_run'] and not state['assistance']:
         try:
             enumerator_list = wordlist.splitlines()
             list_length = len(enumerator_list)
-            if state['extension_bool'] and state['directory_mode']:
+            if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
                     list_length *= 2
-                else:
+                elif len(extensions) > 1:
                     list_length *= len(extensions)
         except:
             if state['no_color']:
@@ -507,10 +519,10 @@ if not state['dry_run'] and not state['assistance']:
 
             enumerator_list = wordlist.splitlines()
             list_length = len(enumerator_list)
-            if state['extension_bool'] and state['directory_mode']:
+            if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
                     list_length *= 2
-                else:
+                elif len(extensions) > 1:
                     list_length *= len(extensions)
             clearScreen()
         except KeyboardInterrupt:
@@ -591,12 +603,13 @@ if not state['dry_run'] and not state['assistance']:
 ###############################
 def printBanner() -> None:
     # Prints a banner based on configured color options.
-    global state # Modifies "lolcat" state flag.
+    # Modifies "lolcat" state flag.
+    global state
     if platform.system() == 'Linux':
         import subprocess
         funny_gato = subprocess.call(['which','lolcat'],stdout=subprocess.DEVNULL)
 
-        if funny_gato == 0 and not state['no_lolcat']: 
+        if funny_gato == 0 and not state['no_lolcat']:
             state['lolcat'] = True
 
     if datetime.now().month == 10:
@@ -613,12 +626,11 @@ def printBanner() -> None:
             print(' Subdomain Mode                       URL Enumerator By: 0xTas')
         print('-----------------------------------------------------------------')
     elif state['lolcat']:
-        banner_file = open('zenBanner.txt','w')
-        banner_file.write(rngBanner())
-        banner_file.close()
+        with open('zenBanner.txt','w') as banner_file:
+            banner_file.write(rngBanner())
 
         os.system('lolcat zenBanner.txt; rm zenBanner.txt')
-        print()
+        print('\n')
         if state['assistance']:
             os.system('echo " Assistance Mode                      URL Enumerator By: 0xTas" | lolcat')
         elif state['directory_mode']:
@@ -629,7 +641,7 @@ def printBanner() -> None:
     else:
         # Initialize color output if on Windows
         if platform.system() == 'Windows' and not state['no_color']: init()
-        print(colored(rngBanner(),f'{rngColor()}'))
+        print(colored(rngBanner(),rngColor()))
 
         if state['assistance']:
             print(colored(' Assistance Mode                        URL Enumerator By: ',rngColor())
@@ -655,9 +667,9 @@ def printBanner() -> None:
         print(colored('-----------------------------------------------------------------',rngColor()))
 
 
-####################################
-#         Enum Functions           #
-####################################
+###################################
+#         Enum Functions          #
+###################################
 def enumSubdomains(enumerator:str) -> None:
     # Enumerates subdomain for target with enumerator from wordlist.
     # Appends valid subdomains to enumerated list. 
@@ -696,22 +708,22 @@ def enumSubdomains(enumerator:str) -> None:
             return
         else:
             with lock:
+                if r.history:
+                    r.status_code = r.history[0].status_code
                 if not state['quiet']:
+
                     if state['no_color']:
-                        print(f' [+] Subdomain Found: {enum_item} | Status: ({r.status_code})    ')
+                        print(f' [+] Subdomain Found: {enum_item.split("//")[1]} | Status: ({r.status_code})           ')
                     else:
                         print(colored(' [','blue',attrs=['bold'])
                             +colored('+','green',attrs=['bold'])
                             +colored(']','blue',attrs=['bold'])
                             +' Subdomain Found: '
-                            +colored(f'{enum_item}','cyan',attrs=['bold','underline'])
+                            +colored(f'{enum_item.split("//")[1]}','cyan',attrs=['bold','underline'])
                             +' | Status: ('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
-                            +')    ')
-                if r.history:
-                    enumerated.append(f'{enum_item} | Status: ({r.history[0].status_code})')
-                else:
-                    enumerated.append(f'{enum_item} | Status: ({r.status_code})')
+                            +')           ')
+                enumerated.append(f'{enum_item} | Status: ({r.status_code})')
 
 
 def enumDirectories(enumerator:str) -> None:
@@ -748,7 +760,7 @@ def enumDirectories(enumerator:str) -> None:
 
         r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
     except:
-        pass
+        pass # Pass here instead of return so our extensions loop below still runs if applicable
     else:
         if r.status_code in ignored_codes:
             pass
@@ -789,74 +801,78 @@ def enumDirectories(enumerator:str) -> None:
 
     # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
-            for ext in extensions:
-                try:
-                    if state['verbose']:
-                        with lock:
-                            if state['no_color']:
-                                print(f' [~] Trying: {enum_item}.{ext}          ',
-                                    end='\r',flush=True)
-                            else:
-                                print(colored(' [',rngColor(),attrs=['bold'])
-                                    +colored('~',rngColor(),attrs=['bold'])
-                                    +colored(']',rngColor(),attrs=['bold'])
-                                    +f' Trying: {enum_item}.{ext}               ',
-                                    end='\r',flush=True)
+        for ext in extensions:
+            try:
+                if state['verbose']:
+                    with lock:
+                        if state['no_color']:
+                            print(f' [~] Trying: {enum_item}.{ext}          ',
+                                end='\r',flush=True)
+                        else:
+                            print(colored(' [',rngColor(),attrs=['bold'])
+                                +colored('~',rngColor(),attrs=['bold'])
+                                +colored(']',rngColor(),attrs=['bold'])
+                                +f' Trying: {enum_item}.{ext}               ',
+                                end='\r',flush=True)
 
-                    r = requests.get(f'{enum_item}.{ext}', headers=headers,
-                                     stream=True, timeout=5, allow_redirects=True)
-                except:
+                r = requests.get(f'{enum_item}.{ext}', headers=headers,
+                                    stream=True, timeout=5, allow_redirects=True)
+            except:
+                return # Now we can return, there's nothing else to do.
+            else:
+                if r.status_code in ignored_codes:
                     return
                 else:
-                    if r.status_code in ignored_codes:
-                        return
-                    else:
-                        with lock:
-                            if not state['quiet']:
-                                if state['no_color']:
-                                    if r.history:
-                                        print('[+] Endpoint Found: ',end='')
-                                        print(f'{enum_item}.{ext} | Status: ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}) ')
-                                    else:
-                                        print(f' [+] Endpoint Found: {enum_item}.{ext} | Status: ({r.status_code})        ')
+                    with lock:
+                        if not state['quiet']:
+                            if state['no_color']:
+                                if r.history:
+                                    print('[+] Endpoint Found: ',end='')
+                                    print(f'{enum_item}.{ext} | Status: ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}) ')
                                 else:
-                                    if r.history:
-                                        print(colored(' [','blue',attrs=['bold'])
-                                            +colored('+','green',attrs=['bold'])
-                                            +colored(']','blue',attrs=['bold'])
-                                            +' Endpoint Found: '
-                                            +colored(f'{enum_item}.{ext}','cyan',attrs=['bold','underline'])+' ('
-                                            +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
-                                            +colored(' -> ',rngColor())
-                                            +colored(f'{r.history[-1].url}','cyan',attrs=['bold','underline'])
-                                            +' | Status: ('
-                                            +colored(f'{r.status_code}','green',attrs=['bold'])+') ')
-                                    else:
-                                        print(colored(' [','blue',attrs=['bold'])
-                                            +colored('+','green',attrs=['bold'])
-                                            +colored(']','blue',attrs=['bold'])+
-                                            ' Endpoint Found: '
-                                            +colored(f'{enum_item}.{ext}','cyan',
-                                            attrs=['bold','underline'])+' | Status: ('
-                                            +colored(f'{r.status_code}','green',
-                                            attrs=['bold'])+')   ')
-
-                            if r.history:
-                                enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
+                                    print(f' [+] Endpoint Found: {enum_item}.{ext} | Status: ({r.status_code})        ')
                             else:
-                                enumerated.append(f'{enum_item}.{ext} | Status: ({r.status_code})')
+                                if r.history:
+                                    print(colored(' [','blue',attrs=['bold'])
+                                        +colored('+','green',attrs=['bold'])
+                                        +colored(']','blue',attrs=['bold'])
+                                        +' Endpoint Found: '
+                                        +colored(f'{enum_item}.{ext}','cyan',attrs=['bold','underline'])+' ('
+                                        +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
+                                        +colored(' -> ',rngColor())
+                                        +colored(f'{r.history[-1].url}','cyan',attrs=['bold','underline'])
+                                        +' | Status: ('
+                                        +colored(f'{r.status_code}','green',attrs=['bold'])+') ')
+                                else:
+                                    print(colored(' [','blue',attrs=['bold'])
+                                        +colored('+','green',attrs=['bold'])
+                                        +colored(']','blue',attrs=['bold'])+
+                                        ' Endpoint Found: '
+                                        +colored(f'{enum_item}.{ext}','cyan',
+                                        attrs=['bold','underline'])+' | Status: ('
+                                        +colored(f'{r.status_code}','green',
+                                        attrs=['bold'])+')   ')
 
+                        if r.history:
+                            enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
+                        else:
+                            enumerated.append(f'{enum_item}.{ext} | Status: ({r.status_code})')
+
+
+#####################################
+#        Progress Functions         #
+#####################################
 def taskProgress(future) -> None:
     # Tracks and reports progress for each task in the thread pool.
     # Prints numerical progress if not verbose mode
     global tasks_complete
     if state['verbose'] or exiting.is_set():
         with lock:
-            if state['extension_bool']:
+            if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
                     tasks_complete += 2
                 else:
-                    tasks_complete += (1*len(extensions))
+                    tasks_complete += len(extensions)
             else:
                 tasks_complete += 1
         return
@@ -890,7 +906,7 @@ def taskProgress(future) -> None:
                         +colored('%','magenta')+' Done.       ',
                         end='\r',flush=True)
 
-            if state['extension_bool']:
+            if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
                     tasks_complete += 2
                 else:
@@ -899,12 +915,68 @@ def taskProgress(future) -> None:
                 tasks_complete += 1
 
 
+def reportResults(time_started: datetime) -> None:
+    # Calculates the time the scan took to complete,
+    # calls the logReults function if desired,
+    # prints the final results to stdout and exits the program. 
+    end_time = datetime.now()
+    delta_time = end_time - time_started
+    elapsed_time = round(delta_time.total_seconds())
+
+    if state['log_results']:
+        print('\n')
+        if state['directory_mode']:
+            if logResults(enumerated, 'Dirs',f'{host}', log_filename):
+                print(f' Results successfully logged to "{log_filename}"')
+            else:
+                print(' [!] Could not log results to a file!')
+        else:
+            if logResults(enumerated, 'Subs',f'{host}', log_filename):
+                print(f' Results successfully logged to "{log_filename}"')
+            else:
+                print(' [!] Could not log results to a file!')
+
+    if state['no_color']:
+        print('\n')
+        print(f' Finished Enumerating At: {end_time.date()} ',end='')
+        print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
+        print(f' Found {len(enumerated)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
+        if enumerated:
+            for item in enumerated:
+                print(' '+item)
+        else:
+            print(' Nobody here but us chickens :(')
+        killColor()
+        die(0)
+    else: # Colored Output
+        print('\n')
+        print(f' Finished Enumerating At: {end_time.date()} ',end='')
+        print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
+        print(f' Found {len(enumerated)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
+        if enumerated:
+            for item in enumerated:
+                if state['directory_mode'] and ' (30' in item:
+                    print(' '+item[:item.index(' (30')+2]
+                        +colored(item[item.index(' (30')+2:item.index(' (30')+5],rngColor())
+                        +item[item.index(' (30')+5:len(item)-4]
+                        +colored(item[len(item)-4:len(item)-1],rngColor())
+                        +item[len(item)-1])
+                else:
+                    print(' '+item[:len(item)-4]
+                        +colored(item[len(item)-4:len(item)-1],rngColor())
+                        +item[len(item)-1])
+        else:
+            print(' Nobody here but us chickens :(')
+        killColor()
+        die(0)
+
+
 ###########################
 #      Main Function      #
 ###########################
 def zenBuster() -> None:
     # Populates the thread pool, and awaits completion of the tasks. 
-    # Catches KeyboardInterrupt if desired, and displays the results when finished.
+    # Catches KeyboardInterrupt if desired, and calls func to display results.
     if not state['quiet']: printBanner()
     if state['assistance']: return zenHelp()
     if state['dry_run']: return die(0)
@@ -983,68 +1055,8 @@ def zenBuster() -> None:
                             +colored(' Cleaning up Running Threads and Preparing Gathered Results..             \n',rngColor()))
 
     # After our threads are finished:
-        end_time = datetime.now()
-        delta_time = end_time - start_time
-        elapsed_time = round(delta_time.total_seconds())
+        reportResults(start_time)
 
-        if state['log_results']:
-            print('\n')
-            if state['directory_mode']:
-                if logResults(enumerated, 'Dirs',f'{host}', log_filename):
-                    print(f' Results successfully logged to "{log_filename}"')
-                else:
-                    print(' [!] Could not log results to a file!')
-            else:
-                if logResults(enumerated, 'Subs',f'{host}', log_filename):
-                    print(f' Results successfully logged to "{log_filename}"')
-                else:
-                    print(' [!] Could not log results to a file!')
-
-        if state['no_color']:
-            print('\n')
-            print(f' Finished Enumerating At: {end_time.date()} ',end='')
-            print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
-            print(f' Found {len(enumerated)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
-            if enumerated:
-                for item in enumerated:
-                    print(' '+item)
-            else:
-                print(' Nobody here but us chickens :(')
-            killColor()
-            die(0)
-        elif state['lolcat']:
-            with open('tmpResults.txt','a') as gato_file:
-                gato_file.write(f'\n Finished Enumerating At: {end_time.date()} ')
-                gato_file.write(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
-                gato_file.write(f'\n Found {len(enumerated)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n\n')
-                if enumerated:
-                    for item in enumerated:
-                        gato_file.write(f' {item}\n')
-                else:
-                    gato_file.write(' Nobody here but us chickens :(')
-            os.system('lolcat tmpResults.txt; rm tmpResults.txt')
-            die(0)
-        else: # Colored Output
-            print('\n')
-            print(f' Finished Enumerating At: {end_time.date()} ',end='')
-            print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
-            print(f' Found {len(enumerated)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
-            if enumerated:
-                for item in enumerated:
-                    if state['directory_mode'] and ' (30' in item:
-                        print(' '+item[:item.index(' (30')+2]
-                            +colored(item[item.index(' (30')+2:item.index(' (30')+5],rngColor())
-                            +item[item.index(' (30')+5:len(item)-4]
-                            +colored(item[len(item)-4:len(item)-1],rngColor())
-                            +item[len(item)-1])
-                    else:
-                        print(' '+item[:len(item)-4]
-                            +colored(item[len(item)-4:len(item)-1],rngColor())
-                            +item[len(item)-1])
-            else:
-                print(' Nobody here but us chickens :(')
-            killColor()
-            die(0)
     except KeyboardInterrupt:
         killColor()
         die(0)
