@@ -242,7 +242,7 @@ def zeroX(hexx: int) -> bool:
         return False
 
 
-def validateHost(hostname:str) -> bool:
+def validateHost(hostname: str) -> bool:
     # Checks validity of given host, with support for both
     # ipv4 and ipv6 formatting, plus auto SSL detection.
     # Modifies "ssl" state flag, also "host", depending on given format.
@@ -864,7 +864,9 @@ def enumDirectories(enumerator:str) -> None:
 #####################################
 def taskProgress(future) -> None:
     # Tracks and reports progress for each task in the thread pool.
-    # Prints numerical progress if not verbose mode
+    # Prints numerical progress if not verbose mode:
+    # (Verbose progreess reporting is handled by Enum Funcs).
+    # Modifies 'tasks_complete' for both local and global use.
     global tasks_complete
     if state['verbose'] or exiting.is_set():
         with lock:
@@ -918,20 +920,23 @@ def taskProgress(future) -> None:
 def reportResults(time_started: datetime) -> None:
     # Calculates the time the scan took to complete,
     # calls the logReults function if desired,
-    # prints the final results to stdout and exits the program. 
+    # prints the final results to stdout and exits the program.
     end_time = datetime.now()
     delta_time = end_time - time_started
     elapsed_time = round(delta_time.total_seconds())
 
+    results = [] # Remove duplicates from enumerated list.
+    [results.append(r) for r in enumerated if r not in results]
+
     if state['log_results']:
         print('\n')
         if state['directory_mode']:
-            if logResults(enumerated, 'Dirs',f'{host}', log_filename):
+            if logResults(results, 'Dirs',f'{host}', log_filename):
                 print(f' Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
         else:
-            if logResults(enumerated, 'Subs',f'{host}', log_filename):
+            if logResults(results, 'Subs',f'{host}', log_filename):
                 print(f' Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
@@ -940,9 +945,9 @@ def reportResults(time_started: datetime) -> None:
         print('\n')
         print(f' Finished Enumerating At: {end_time.date()} ',end='')
         print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
-        print(f' Found {len(enumerated)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
-        if enumerated:
-            for item in enumerated:
+        print(f' Found {len(results)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
+        if results:
+            for item in results:
                 print(' '+item)
         else:
             print(' Nobody here but us chickens :(')
@@ -952,10 +957,12 @@ def reportResults(time_started: datetime) -> None:
         print('\n')
         print(f' Finished Enumerating At: {end_time.date()} ',end='')
         print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
-        print(f' Found {len(enumerated)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
-        if enumerated:
-            for item in enumerated:
+        print(f' Found {len(results)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
+        if results:
+            for item in results:
                 if state['directory_mode'] and ' (30' in item:
+                    # Indexing-surgery to color just our response codes.
+                    # There's probably a neater way to do this ¯\_(ツ)_/¯
                     print(' '+item[:item.index(' (30')+2]
                         +colored(item[item.index(' (30')+2:item.index(' (30')+5],rngColor())
                         +item[item.index(' (30')+5:len(item)-4]
@@ -983,42 +990,16 @@ def zenBuster() -> None:
 
     try:
         start_time = datetime.now()
-        if state['directory_mode']:
+        enum_func = enumSubdomains
 
+        if state['directory_mode']:
+            enum_func = enumDirectories
             if state['no_color']:
                 print(f'\n Enumerating Directories for {host}\n')
             else:
                 print(colored('\n Enumerating',rngColor())
                     +colored(' Directories','green')+' for: '
                     +colored(f'{host}',rngColor())+'\n')
-
-            with ThreadPoolExecutor() as executor:
-                try:
-                    futures = [executor.submit(enumDirectories, enumerator) for enumerator in enumerator_list]
-                    for future in futures:
-                        future.add_done_callback(taskProgress)
-                    while tasks_complete < list_length:
-                        sleep(0.420)
-                except KeyboardInterrupt:
-                    exiting.set()
-                    if state['no_color']:
-                        print('\n [!] Caught KeyboardInterrupt. [!]          \n Preparing to Exit..                  ')
-                    else:
-                        print(colored('\n [','yellow',attrs=['bold'])
-                            +colored('!','red',attrs=['bold'])
-                            +colored(']','yellow',attrs=['bold'])+' Caught '
-                            +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. '
-                            +colored('[','yellow',attrs=['bold'])
-                            +colored('!','red',attrs=['bold'])
-                            +colored(']                      ','yellow',attrs=['bold']))
-                        print(colored(' Preparing to Exit..                  ','red'))
-                    executor.shutdown(wait=False,cancel_futures=True)
-                    if state['no_color']:
-                        print('\n [..] Cleaning up Running Threads and Preparing Gathered Results..                  \n')
-                    else:
-                        print(colored('\n [','red')+colored('.',rngColor())
-                            +colored('.',rngColor())+colored(']','red')
-                            +colored(' Cleaning up Running Threads and Preparing Gathered Results..             \n',rngColor()))  
         else:
             if state['no_color']:
                 print(f'\n Enumerating Subdomains for {host}\n')
@@ -1026,33 +1007,35 @@ def zenBuster() -> None:
                 print(colored('\n Enumerating',rngColor())
                     +colored(' Subdomains','green')+' for: '
                     +colored(f'{host}',rngColor())+'\n')
-            with ThreadPoolExecutor() as executor:
-                try:
-                    futures = [executor.submit(enumSubdomains, enumerator) for enumerator in enumerator_list]
-                    for future in futures:
-                        future.add_done_callback(taskProgress)
-                    while tasks_complete < list_length:
-                        sleep(0.420)
-                except KeyboardInterrupt:
-                    exiting.set()
-                    if state['no_color']:
-                        print('\n [!] Caught KeyboardInterrupt. [!]          \n Preparing to Exit..                  ')
-                    else:
-                        print(colored('\n [','yellow',attrs=['bold'])
-                            +colored('!','red',attrs=['bold'])
-                            +colored(']','yellow',attrs=['bold'])+' Caught '
-                            +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. '
-                            +colored('[','yellow',attrs=['bold'])
-                            +colored('!','red',attrs=['bold'])
-                            +colored(']                      ','yellow',attrs=['bold']))
-                        print(colored(' Preparing to Exit..                  ','red'))
-                    executor.shutdown(wait=False,cancel_futures=True)
-                    if state['no_color']:
-                        print('\n [..] Cleaning up Running Threads and Preparing Gathered Results..                  \n')
-                    else:
-                        print(colored('\n [','red')+colored('.',rngColor())
-                            +colored('.',rngColor())+colored(']','red')
-                            +colored(' Cleaning up Running Threads and Preparing Gathered Results..             \n',rngColor()))
+
+        with ThreadPoolExecutor() as executor:
+            try:
+                futures = [executor.submit(enum_func, enumerator) for enumerator in enumerator_list]
+                for future in futures:
+                    future.add_done_callback(taskProgress)
+                while tasks_complete < list_length:
+                    sleep(0.420)
+            except KeyboardInterrupt:
+                exiting.set()
+                print('\n ')
+                if state['no_color']:
+                    print('\n [!] Caught KeyboardInterrupt. [!]          \n Preparing to Exit..                  ')
+                else:
+                    print(colored('\n [','yellow',attrs=['bold'])
+                        +colored('!','red',attrs=['bold'])
+                        +colored(']','yellow',attrs=['bold'])+' Caught '
+                        +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. '
+                        +colored('[','yellow',attrs=['bold'])
+                        +colored('!','red',attrs=['bold'])
+                        +colored(']                      ','yellow',attrs=['bold']))
+                    print(colored(' Preparing to Exit..                  ','red'))
+                executor.shutdown(wait=False,cancel_futures=True)
+                if state['no_color']:
+                    print('\n [..] Cleaning up Running Threads and Preparing Gathered Results..                  \n')
+                else:
+                    print(colored('\n [','red')+colored('.',rngColor())
+                        +colored('.',rngColor())+colored(']','red')
+                        +colored(' Cleaning up Running Threads and Preparing Gathered Results..             \n',rngColor()))  
 
     # After our threads are finished:
         reportResults(start_time)
