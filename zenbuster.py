@@ -380,6 +380,7 @@ signal.signal(signal.SIGTERM, signalHandler)
 ########################################
 #    Parse args for runtime options    #
 ########################################
+extensions = []
 log_filename = None
 for i in range(1,len(args)):
 
@@ -440,6 +441,10 @@ for i in range(1,len(args)):
     elif args[i] == '-D' or args[i].lower() == '--debug':
         state['debug'] = True
 
+# Prevent misuse of extensions arg from breaking program logic further down..
+if not state['directory_mode']:
+    state['extension_bool'] == False
+    extensions = []
 
 ################################
 #    Defining Critical Data    #
@@ -493,7 +498,9 @@ if not state['dry_run'] and not state['assistance']:
             if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
                     list_length *= 2
-                elif len(extensions) > 1:
+                elif len(extensions) == 2:
+                    list_length *= 3
+                elif len(extensions) > 2:
                     list_length *= len(extensions)
         except:
             if state['no_color']:
@@ -522,7 +529,9 @@ if not state['dry_run'] and not state['assistance']:
             if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
                     list_length *= 2
-                elif len(extensions) > 1:
+                elif len(extensions) == 2:
+                    list_length *= 3
+                elif len(extensions) > 2:
                     list_length *= len(extensions)
             clearScreen()
         except KeyboardInterrupt:
@@ -767,41 +776,46 @@ def enumDirectories(enumerator:str) -> None:
         else:
             with lock:
                 if not state['quiet']:
+                    enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
                     if state['no_color']:
                         if r.history:
+                            location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                             print('[+] Endpoint Found: ',end='')
-                            print(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}) ')
+                            print(f'{enum_item_fmt} ({r.history[0].status_code}) ->',end='')
+                            print(f' {location_item} ({r.status_code})                 ')
                         else:
-                            print(f' [+] Endpoint Found: {enum_item} | Status: ({r.status_code})    ')
+                            print(f' [+] Endpoint Found: {enum_item_fmt} ({r.status_code})                      ')
                     else:
                         if r.history:
+                            location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
                                 +colored(']','blue',attrs=['bold'])
                                 +' Endpoint Found: '
-                                +colored(f'{enum_item}','cyan',attrs=['bold','underline'])+' ('
+                                +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])+' ('
                                 +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
                                 +colored(' -> ',rngColor())
-                                +colored(f'{r.history[-1].url}','cyan',attrs=['bold','underline'])
-                                +' | Status: ('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+') ')
+                                +colored(f'{location_item}','cyan',attrs=['bold','underline'])
+                                +' ('
+                                +colored(f'{r.status_code}','green',attrs=['bold'])+')                     ')
                         else:
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
                                 +colored(']','blue',attrs=['bold'])
                                 +' Endpoint Found: '
-                                +colored(f'{enum_item}','cyan',attrs=['bold','underline'])
-                                +' | Status: ('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+')         ')   
+                                +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
+                                +' ('
+                                +colored(f'{r.status_code}','green',attrs=['bold'])+')                     ')   
      
                 if r.history:
-                    enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
+                    enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} | Status: ({r.status_code})')
                 else:
                     enumerated.append(f'{enum_item} | Status: ({r.status_code})')
 
     # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
         for ext in extensions:
+            if f'.{ext}' in enumerator: return # Avoid duplicate scans.
             try:
                 if state['verbose']:
                     with lock:
@@ -815,8 +829,7 @@ def enumDirectories(enumerator:str) -> None:
                                 +f' Trying: {enum_item}.{ext}               ',
                                 end='\r',flush=True)
 
-                r = requests.get(f'{enum_item}.{ext}', headers=headers,
-                                    stream=True, timeout=5, allow_redirects=True)
+                r = requests.get(f'{enum_item}.{ext}', headers=headers,stream=True, timeout=5, allow_redirects=True)
             except:
                 return # Now we can return, there's nothing else to do.
             else:
@@ -825,22 +838,25 @@ def enumDirectories(enumerator:str) -> None:
                 else:
                     with lock:
                         if not state['quiet']:
+                            enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
                             if state['no_color']:
                                 if r.history:
+                                    location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                                     print('[+] Endpoint Found: ',end='')
-                                    print(f'{enum_item}.{ext} | Status: ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code}) ')
+                                    print(f'{enum_item_fmt}.{ext} | Status: ({r.history[0].status_code}) -> {location_item} | Status: ({r.status_code}) ')
                                 else:
-                                    print(f' [+] Endpoint Found: {enum_item}.{ext} | Status: ({r.status_code})        ')
+                                    print(f' [+] Endpoint Found: {enum_item_fmt}.{ext} | Status: ({r.status_code})        ')
                             else:
                                 if r.history:
+                                    location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                                     print(colored(' [','blue',attrs=['bold'])
                                         +colored('+','green',attrs=['bold'])
                                         +colored(']','blue',attrs=['bold'])
                                         +' Endpoint Found: '
-                                        +colored(f'{enum_item}.{ext}','cyan',attrs=['bold','underline'])+' ('
+                                        +colored(f'{enum_item_fmt}.{ext}','cyan',attrs=['bold','underline'])+' ('
                                         +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
                                         +colored(' -> ',rngColor())
-                                        +colored(f'{r.history[-1].url}','cyan',attrs=['bold','underline'])
+                                        +colored(f'{location_item}','cyan',attrs=['bold','underline'])
                                         +' | Status: ('
                                         +colored(f'{r.status_code}','green',attrs=['bold'])+') ')
                                 else:
@@ -848,13 +864,13 @@ def enumDirectories(enumerator:str) -> None:
                                         +colored('+','green',attrs=['bold'])
                                         +colored(']','blue',attrs=['bold'])+
                                         ' Endpoint Found: '
-                                        +colored(f'{enum_item}.{ext}','cyan',
+                                        +colored(f'{enum_item_fmt}.{ext}','cyan',
                                         attrs=['bold','underline'])+' | Status: ('
                                         +colored(f'{r.status_code}','green',
                                         attrs=['bold'])+')   ')
 
                         if r.history:
-                            enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].url} | Status: ({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} | Status: ({r.status_code})')
                         else:
                             enumerated.append(f'{enum_item}.{ext} | Status: ({r.status_code})')
 
@@ -870,13 +886,7 @@ def taskProgress(future) -> None:
     global tasks_complete
     if state['verbose'] or exiting.is_set():
         with lock:
-            if state['directory_mode'] and state['extension_bool']:
-                if len(extensions) == 1:
-                    tasks_complete += 2
-                else:
-                    tasks_complete += len(extensions)
-            else:
-                tasks_complete += 1
+            tasks_complete += (len(extensions)+1)
         return
 
     elif not state['verbose']:
@@ -907,14 +917,7 @@ def taskProgress(future) -> None:
                         +f'{round((tasks_complete/list_length)*100,2)}'
                         +colored('%','magenta')+' Done.       ',
                         end='\r',flush=True)
-
-            if state['directory_mode'] and state['extension_bool']:
-                if len(extensions) == 1:
-                    tasks_complete += 2
-                else:
-                    tasks_complete += (1*len(extensions))
-            else:
-                tasks_complete += 1
+            tasks_complete += (len(extensions)+1)
 
 
 def reportResults(time_started: datetime) -> None:
@@ -926,7 +929,7 @@ def reportResults(time_started: datetime) -> None:
     elapsed_time = round(delta_time.total_seconds())
 
     results = [] # Remove duplicates from enumerated list.
-    [results.append(r) for r in enumerated if r not in results]
+    [results.append(r) for r in enumerated if r not in results and r != f'http://{host}' and r != f'https://{host}']
 
     if state['log_results']:
         print('\n')
@@ -962,15 +965,15 @@ def reportResults(time_started: datetime) -> None:
             for item in results:
                 if state['directory_mode'] and ' (30' in item:
                     # Indexing-surgery to color just our response codes.
-                    # There's probably a neater way to do this ¯\_(ツ)_/¯
-                    print(' '+item[:item.index(' (30')+2]
-                        +colored(item[item.index(' (30')+2:item.index(' (30')+5],rngColor())
-                        +item[item.index(' (30')+5:len(item)-4]
-                        +colored(item[len(item)-4:len(item)-1],rngColor())
+                    # There's probably a more readable way to do this ¯\_(ツ)_/¯
+                    print(' '+item[ : item.index(' (30')+2]
+                        +colored(item[item.index(' (30')+2 : item.index(' (30')+5],rngColor())
+                        +item[item.index(' (30')+5 : len(item)-4]
+                        +colored(item[len(item)-4 : len(item)-1],rngColor())
                         +item[len(item)-1])
                 else:
-                    print(' '+item[:len(item)-4]
-                        +colored(item[len(item)-4:len(item)-1],rngColor())
+                    print(' '+item[ : len(item)-4]
+                        +colored(item[len(item)-4 : len(item)-1],rngColor())
                         +item[len(item)-1])
         else:
             print(' Nobody here but us chickens :(')
