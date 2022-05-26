@@ -1020,7 +1020,8 @@ def reportResults(time_started: datetime) -> None:
         print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:'
             f'{str(end_time.second).zfill(2)}.')
         print(f' Found {len(results)} Valid Endpoints in '
-            f'{round(elapsed_time/60,2)} Minutes:\n')
+            f'{round(elapsed_time/60,2)} Minutes:'.ljust(width()))
+        print()
         if results:
             for item in results:
                 print(' '+item)
@@ -1033,7 +1034,8 @@ def reportResults(time_started: datetime) -> None:
         print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:'
             f'{str(end_time.second).zfill(2)}.')
         print(f' Found {len(results)} Valid Endpoints in '
-            f'{round(elapsed_time/60,2)} Minutes:\n')
+            f'{round(elapsed_time/60,2)} Minutes:'.ljust(width()))
+        print()
         if results:
             for item in results:
                 if state['directory_mode'] and ' (30' in item:
