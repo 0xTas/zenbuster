@@ -231,6 +231,10 @@ def die(code: int) -> None:
     raise SystemExit(code)
 
 
+def width() -> int:
+    return os.get_terminal_size()[0] - 15
+
+
 def rngBanner() -> str:
     banners = [banner,banner2,banner3]
     return random.choice(banners)
@@ -717,13 +721,13 @@ def enumSubdomains(enumerator:str) -> None:
         if state['verbose']:
             with lock:
                 if state['no_color']:
-                    print(f' [~] Trying: {enum_item}                         '
-                        ,end='\r',flush=True)
+                    print(f' [~] Trying: {enum_item}   ',
+                        end='\r',flush=True)
                 else:
                     print(colored(' [',rngColor(),attrs=['bold'])
                         +colored('~',rngColor(),attrs=['bold'])
                         +colored(']',rngColor(),attrs=['bold'])
-                        +f' Trying: {enum_item}                  ',
+                        +f' Trying: {enum_item}   ',
                         end='\r',flush=True)
 
         r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
@@ -739,17 +743,17 @@ def enumSubdomains(enumerator:str) -> None:
                 if not state['quiet']:
 
                     if state['no_color']:
-                        print(f' [+] Subdomain Found: {enum_item.split("//")[1]} | Status: ({r.status_code})           ')
+                        print(f' [+] Subdomain Found: {enum_item.split("//")[1]} ({r.status_code})'.ljust(width()))
                     else:
                         print(colored(' [','blue',attrs=['bold'])
                             +colored('+','green',attrs=['bold'])
                             +colored(']','blue',attrs=['bold'])
                             +' Subdomain Found: '
                             +colored(f'{enum_item.split("//")[1]}','cyan',attrs=['bold','underline'])
-                            +' | Status: ('
+                            +' ('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
-                            +')           ')
-                enumerated.append(f'{enum_item} | Status: ({r.status_code})')
+                            +')'.ljust(width()))
+                enumerated.append(f'{enum_item} ({r.status_code})')
 
 
 def enumDirectories(enumerator:str) -> None:
@@ -775,13 +779,13 @@ def enumDirectories(enumerator:str) -> None:
         if state['verbose']:
             with lock:
                 if state['no_color']:
-                    print(f' [~] Trying: {enum_item}                      ',
+                    print(f' [~] Trying: {enum_item}   ',
                         end='\r',flush=True)
                 else:
                     print(colored(' [',rngColor(),attrs=['bold'])
                         +colored('~',rngColor(),attrs=['bold'])
                         +colored(']',rngColor(),attrs=['bold'])
-                        +f' Trying: {enum_item}                 ',
+                        +f' Trying: {enum_item}   ',
                         end='\r',flush=True)
 
         r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
@@ -799,9 +803,9 @@ def enumDirectories(enumerator:str) -> None:
                             location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                             print('[+] Endpoint Found: ',end='')
                             print(f'{enum_item_fmt} ({r.history[0].status_code}) ->',end='')
-                            print(f' {location_item} ({r.status_code})                 ')
+                            print(f' {location_item} ({r.status_code})'.ljust(width()))
                         else:
-                            print(f' [+] Endpoint Found: {enum_item_fmt} ({r.status_code})                      ')
+                            print(f' [+] Endpoint Found: {enum_item_fmt} ({r.status_code})'.ljust(width()))
                     else:
                         if r.history:
                             location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
@@ -814,7 +818,7 @@ def enumDirectories(enumerator:str) -> None:
                                 +colored(' -> ',rngColor())
                                 +colored(f'{location_item}','cyan',attrs=['bold','underline'])
                                 +' ('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+')                     ')
+                                +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
                         else:
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
@@ -822,12 +826,12 @@ def enumDirectories(enumerator:str) -> None:
                                 +' Endpoint Found: '
                                 +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
                                 +' ('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+')                     ')   
+                                +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))   
      
                 if r.history:
-                    enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} | Status: ({r.status_code})')
+                    enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} ({r.status_code})')
                 else:
-                    enumerated.append(f'{enum_item} | Status: ({r.status_code})')
+                    enumerated.append(f'{enum_item} ({r.status_code})')
 
     # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
@@ -837,13 +841,13 @@ def enumDirectories(enumerator:str) -> None:
                 if state['verbose']:
                     with lock:
                         if state['no_color']:
-                            print(f' [~] Trying: {enum_item}.{ext}          ',
+                            print(f' [~] Trying: {enum_item}.{ext}   ',
                                 end='\r',flush=True)
                         else:
                             print(colored(' [',rngColor(),attrs=['bold'])
                                 +colored('~',rngColor(),attrs=['bold'])
                                 +colored(']',rngColor(),attrs=['bold'])
-                                +f' Trying: {enum_item}.{ext}               ',
+                                +f' Trying: {enum_item}.{ext}   ',
                                 end='\r',flush=True)
 
                 r = requests.get(f'{enum_item}.{ext}', headers=headers,stream=True, timeout=5, allow_redirects=True)
@@ -860,9 +864,9 @@ def enumDirectories(enumerator:str) -> None:
                                 if r.history:
                                     location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                                     print('[+] Endpoint Found: ',end='')
-                                    print(f'{enum_item_fmt}.{ext} | Status: ({r.history[0].status_code}) -> {location_item} | Status: ({r.status_code}) ')
+                                    print(f'{enum_item_fmt}.{ext} ({r.history[0].status_code}) -> {location_item} ({r.status_code})'.ljust(width()))
                                 else:
-                                    print(f' [+] Endpoint Found: {enum_item_fmt}.{ext} | Status: ({r.status_code})        ')
+                                    print(f' [+] Endpoint Found: {enum_item_fmt}.{ext} ({r.status_code})'.ljust(width()))
                             else:
                                 if r.history:
                                     location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
@@ -874,22 +878,22 @@ def enumDirectories(enumerator:str) -> None:
                                         +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
                                         +colored(' -> ',rngColor())
                                         +colored(f'{location_item}','cyan',attrs=['bold','underline'])
-                                        +' | Status: ('
-                                        +colored(f'{r.status_code}','green',attrs=['bold'])+') ')
+                                        +' ('
+                                        +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
                                 else:
                                     print(colored(' [','blue',attrs=['bold'])
                                         +colored('+','green',attrs=['bold'])
                                         +colored(']','blue',attrs=['bold'])+
                                         ' Endpoint Found: '
                                         +colored(f'{enum_item_fmt}.{ext}','cyan',
-                                        attrs=['bold','underline'])+' | Status: ('
+                                        attrs=['bold','underline'])+' ('
                                         +colored(f'{r.status_code}','green',
-                                        attrs=['bold'])+')   ')
+                                        attrs=['bold'])+')'.ljust(width()))
 
                         if r.history:
-                            enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} | Status: ({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} ({r.status_code})')
                         else:
-                            enumerated.append(f'{enum_item}.{ext} | Status: ({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} ({r.status_code})')
 
 
 #####################################
@@ -910,11 +914,11 @@ def taskProgress(future) -> None:
         with lock:
             if state['no_color']:
                 if not state['directory_mode']:
-                    print(f' [~] Enumerating Subdomain {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.     '
-                            ,end='\r',flush=True)
+                    print(f' [~] Enumerating Subdomain {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
+                        end='\r',flush=True)
                 else:
-                    print(f' [~] Enumerating Directory {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.     '
-                            ,end='\r',flush=True)
+                    print(f' [~] Enumerating Directory {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
+                        end='\r',flush=True)
             else:
                 if not state['directory_mode']:
                     print(colored(' [',rngColor())+colored('~',rngColor())
@@ -923,7 +927,7 @@ def taskProgress(future) -> None:
                         +colored(f'{list_length}','green')+'. Progress: '
                         +colored('~','cyan')
                         +f'{round((tasks_complete/list_length)*100,2)}'
-                        +colored('%','magenta')+' Done.       ',
+                        +colored('%','magenta')+' Done.',
                         end='\r',flush=True) 
                 else:
                     print(colored(' [',rngColor())+colored('~',rngColor())
@@ -932,7 +936,7 @@ def taskProgress(future) -> None:
                         +colored(f'{list_length}','green')+'. Progress: '
                         +colored('~','cyan')
                         +f'{round((tasks_complete/list_length)*100,2)}'
-                        +colored('%','magenta')+' Done.       ',
+                        +colored('%','magenta')+' Done.',
                         end='\r',flush=True)
             tasks_complete += (len(extensions)+1)
 
@@ -1039,7 +1043,8 @@ def zenBuster() -> None:
                 exiting.set()
                 print('\n ')
                 if state['no_color']:
-                    print('\n [!] Caught KeyboardInterrupt. [!]          \n Preparing to Exit..                  ')
+                    print('\n [!] Caught KeyboardInterrupt. [!]'.ljust(width()))
+                    print(' Preparing to Exit..'.ljust(width()))
                 else:
                     print(colored('\n [','yellow',attrs=['bold'])
                         +colored('!','red',attrs=['bold'])
@@ -1047,15 +1052,15 @@ def zenBuster() -> None:
                         +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. '
                         +colored('[','yellow',attrs=['bold'])
                         +colored('!','red',attrs=['bold'])
-                        +colored(']                      ','yellow',attrs=['bold']))
-                    print(colored(' Preparing to Exit..                  ','red'))
+                        +colored(']'.ljust(width()),'yellow',attrs=['bold']))
+                    print(colored(' Preparing to Exit..'.ljust(width()),'red'))
                 executor.shutdown(wait=False,cancel_futures=True)
                 if state['no_color']:
-                    print('\n [..] Cleaning up Running Threads and Preparing Gathered Results..                  \n')
+                    print('\n [..] Cleaning up Running Threads and Preparing Gathered Results..'.ljust(width()))
                 else:
                     print(colored('\n [','red')+colored('.',rngColor())
                         +colored('.',rngColor())+colored(']','red')
-                        +colored(' Cleaning up Running Threads and Preparing Gathered Results..             \n',rngColor()))  
+                        +colored(' Cleaning up Running Threads and Preparing Gathered Results..'.ljust(width()),rngColor()))  
 
         # After our threads are finished:
         reportResults(start_time)
@@ -1064,15 +1069,16 @@ def zenBuster() -> None:
         die(0)
     except Exception as err:
         if state['no_color']:
-            print(f'\n [!] Unrecoverable Error:\n {err}')
-            if state['debug']: raise err
+            print(f'\n [!] Unrecoverable Error [!]'.ljust(width()))
+            raise err
         else:
             print(colored(' [','red')+colored('!','yellow')+colored(']','red')
-                +colored(' Unrecoverable Error:','yellow')
-                +colored(f'\n {err}','red'))
-            if state['debug']: raise err
-        killColor()
-        die(1)
+                +colored(' Unrecoverable Error ','yellow')
+                +colored(f'[','red')
+                +colored('!','yellow')
+                +colored(']'.ljust(width()),'red'))
+            killColor()
+            raise err
 
 
 if zeroX(__author__):
