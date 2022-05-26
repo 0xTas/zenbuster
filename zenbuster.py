@@ -466,6 +466,8 @@ for i in range(1,len(args)):
 if not state['directory_mode']:
     state['extension_bool'] == False
     extensions = []
+if state['verbose']:
+    state['log_results'] = True
 
 ################################
 #    Defining Critical Data    #
@@ -718,18 +720,6 @@ def enumSubdomains(enumerator:str) -> None:
             enum_item = f'http://{enumerator}.{host}'
 
     try:
-        if state['verbose']:
-            with lock:
-                if state['no_color']:
-                    print(f' [~] Trying: {enum_item}   ',
-                        end='\r',flush=True)
-                else:
-                    print(colored(' [',rngColor(),attrs=['bold'])
-                        +colored('~',rngColor(),attrs=['bold'])
-                        +colored(']',rngColor(),attrs=['bold'])
-                        +f' Trying: {enum_item}   ',
-                        end='\r',flush=True)
-
         r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
     except:
         return
@@ -753,7 +743,10 @@ def enumSubdomains(enumerator:str) -> None:
                             +' ('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
                             +')'.ljust(width()))
-                enumerated.append(f'{enum_item} ({r.status_code})')
+                if state['verbose']:
+                    enumerated.append(f'{enum_item}  [Len: {len(r.content)}] ({r.status_code})')
+                else:
+                    enumerated.append(f'{enum_item} ({r.status_code})')
 
 
 def enumDirectories(enumerator:str) -> None:
@@ -776,18 +769,6 @@ def enumDirectories(enumerator:str) -> None:
         return
 
     try:
-        if state['verbose']:
-            with lock:
-                if state['no_color']:
-                    print(f' [~] Trying: {enum_item}   ',
-                        end='\r',flush=True)
-                else:
-                    print(colored(' [',rngColor(),attrs=['bold'])
-                        +colored('~',rngColor(),attrs=['bold'])
-                        +colored(']',rngColor(),attrs=['bold'])
-                        +f' Trying: {enum_item}   ',
-                        end='\r',flush=True)
-
         r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
     except:
         pass # Pass here instead of return so our extensions loop below still runs if applicable
@@ -826,29 +807,22 @@ def enumDirectories(enumerator:str) -> None:
                                 +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
                                 +' ('
                                 +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))   
-     
-                if r.history:
-                    enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} ({r.status_code})')
+                if state['verbose']:
+                    if r.history:
+                        enumerated.append(f'{enum_item}  [Len: {len(r.content)}] ({r.history[0].status_code}) -> {r.url}  [Len: {len(r.content)}] ({r.status_code})')
+                    else:
+                        enumerated.append(f'{enum_item}  [Len: {len(r.content)}] ({r.status_code})')
                 else:
-                    enumerated.append(f'{enum_item} ({r.status_code})')
+                    if r.history:
+                        enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.url} ({r.status_code})')
+                    else:
+                        enumerated.append(f'{enum_item} ({r.status_code})')
 
     # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
         for ext in extensions:
             if f'.{ext}' in enumerator: return # Avoid duplicate scans.
             try:
-                if state['verbose']:
-                    with lock:
-                        if state['no_color']:
-                            print(f' [~] Trying: {enum_item}.{ext}   ',
-                                end='\r',flush=True)
-                        else:
-                            print(colored(' [',rngColor(),attrs=['bold'])
-                                +colored('~',rngColor(),attrs=['bold'])
-                                +colored(']',rngColor(),attrs=['bold'])
-                                +f' Trying: {enum_item}.{ext}   ',
-                                end='\r',flush=True)
-
                 r = requests.get(f'{enum_item}.{ext}', headers=headers,stream=True, timeout=5, allow_redirects=True)
             except:
                 return # Now we can return, there's nothing else to do.
@@ -887,11 +861,16 @@ def enumDirectories(enumerator:str) -> None:
                                         attrs=['bold','underline'])+' ('
                                         +colored(f'{r.status_code}','green',
                                         attrs=['bold'])+')'.ljust(width()))
-
-                        if r.history:
-                            enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.history[-1].headers["location"]} ({r.status_code})')
+                        if state['verbose']:
+                            if r.history:
+                                enumerated.append(f'{enum_item}.{ext}  [Len: {len(r.content)}] ({r.history[0].status_code}) -> {r.url}  [Len: {len(r.content)}] ({r.status_code}) ')
+                            else:
+                                enumerated.append(f'{enum_item}.{ext}  [Len: {r.content}] ({r.status_code})')
                         else:
-                            enumerated.append(f'{enum_item}.{ext} ({r.status_code})')
+                            if r.history:
+                                enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.url} ({r.status_code})')
+                            else:
+                                enumerated.append(f'{enum_item}.{ext} ({r.status_code})')
 
 
 #####################################
@@ -903,40 +882,39 @@ def taskProgress(future) -> None:
     # (Verbose progreess reporting is handled by Enum Funcs).
     # Modifies 'tasks_complete' for both local and global use.
     global tasks_complete
-    if state['verbose'] or exiting.is_set():
+    if exiting.is_set():
         with lock:
             tasks_complete += (len(extensions)+1)
         return
 
-    elif not state['verbose']:
-        with lock:
-            if state['no_color']:
-                if not state['directory_mode']:
-                    print(f' [~] Enumerating Subdomain {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
-                        end='\r',flush=True)
-                else:
-                    print(f' [~] Enumerating Directory {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
-                        end='\r',flush=True)
+    with lock:
+        if state['no_color']:
+            if not state['directory_mode']:
+                print(f' [~] Enumerating Subdomain {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
+                    end='\r',flush=True)
             else:
-                if not state['directory_mode']:
-                    print(colored(' [',rngColor())+colored('~',rngColor())
-                        +colored(']',rngColor())+' Enumerating Subdomain '
-                        +colored(f'{tasks_complete}','red')+'/'
-                        +colored(f'{list_length}','green')+'. Progress: '
-                        +colored('~','cyan')
-                        +f'{round((tasks_complete/list_length)*100,2)}'
-                        +colored('%','magenta')+' Done.',
-                        end='\r',flush=True) 
-                else:
-                    print(colored(' [',rngColor())+colored('~',rngColor())
-                        +colored(']',rngColor())+' Enumerating Directory '
-                        +colored(f'{tasks_complete}','red')+'/'
-                        +colored(f'{list_length}','green')+'. Progress: '
-                        +colored('~','cyan')
-                        +f'{round((tasks_complete/list_length)*100,2)}'
-                        +colored('%','magenta')+' Done.',
-                        end='\r',flush=True)
-            tasks_complete += (len(extensions)+1)
+                print(f' [~] Enumerating Directory {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
+                    end='\r',flush=True)
+        else:
+            if not state['directory_mode']:
+                print(colored(' [',rngColor())+colored('~',rngColor())
+                    +colored(']',rngColor())+' Enumerating Subdomain '
+                    +colored(f'{tasks_complete}','red')+'/'
+                    +colored(f'{list_length}','green')+'. Progress: '
+                    +colored('~','cyan')
+                    +f'{round((tasks_complete/list_length)*100,2)}'
+                    +colored('%','magenta')+' Done.',
+                    end='\r',flush=True) 
+            else:
+                print(colored(' [',rngColor())+colored('~',rngColor())
+                    +colored(']',rngColor())+' Enumerating Directory '
+                    +colored(f'{tasks_complete}','red')+'/'
+                    +colored(f'{list_length}','green')+'. Progress: '
+                    +colored('~','cyan')
+                    +f'{round((tasks_complete/list_length)*100,2)}'
+                    +colored('%','magenta')+' Done.',
+                    end='\r',flush=True)
+        tasks_complete += (len(extensions)+1)
 
 
 def reportResults(time_started: datetime) -> None:
@@ -984,7 +962,7 @@ def reportResults(time_started: datetime) -> None:
             for item in results:
                 if state['directory_mode'] and ' (30' in item:
                     # Indexing-surgery to color just our response codes.
-                    # There's probably a more readable way to do this ¯\_(ツ)_/¯
+                    # There's probably a more readable way to write this ¯\_(ツ)_/¯
                     print(' '+item[ : item.index(' (30')+2]
                         +colored(item[item.index(' (30')+2 : item.index(' (30')+5],rngColor())
                         +item[item.index(' (30')+5 : len(item)-4]
