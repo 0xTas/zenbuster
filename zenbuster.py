@@ -3,7 +3,7 @@
 ##################################################
 #                 ZenBuster.py                   #
 #  Multi-Platform Multithreaded URL Enumeration  #
-#       Author: Zach Griffin aka: 0xTas          #
+#       Author: Zach Griffin, aka: 0xTas         #
 #            Email: admin@0xTas.dev              #
 #           https://github.com/0xTas             #
 ##################################################
@@ -86,7 +86,7 @@ state = {
 'directory_mode': False,
 }
 
-# Any funcs that modify this global state
+# Any funcs that modify this global state object
 # -are marked at the top of their scope with "global state".
 # Furthermore, any funcs that include side-effects are marked
 # -at the top of their scope with the 'global' declaration.
@@ -246,7 +246,7 @@ def validateHost(hostname: str) -> bool:
     # Checks validity of given host, with support for both
     # ipv4 and ipv6 formatting, plus auto SSL detection.
     # Modifies "ssl" state flag, also "host", depending on given format.
-    global state, host 
+    global state, host
     print(' Validating Host...')
     try:
         if hostname.startswith('https'): state['ssl'] = True
@@ -284,7 +284,7 @@ def zenHelp() -> None:
         print('\n -O [filename],  --out-file: Log Results to a File (Accepts Custom Name/Path).')
         print('\n -v,             --verbose: Verbose Terminal Output.')
         print('\n -Q,             --quiet: Minimal Terminal Output.')
-        print('\n -nr,            --no-lolcat: Disables Lolcat Output (Linux only).')
+        print('\n -nl,            --no-lolcat: Disables lolcat Output (Linux only).')
         print('\n -nc,            --no-color: Disables Colored Output.')
         print('\n -D,             --debug: Raises any Exceptions with Detailed Tracebacks.')
     else:
@@ -330,9 +330,9 @@ def zenHelp() -> None:
             +',             '
             +colored('--quiet',rngColor())
             +': Minimal Terminal Output')
-        print(colored('\n -nr',rngColor())
+        print(colored('\n -nl',rngColor())
             +',            '
-            +colored('--no-rainbow',rngColor())
+            +colored('--no-lolcat',rngColor())
             +': Disables Rainbow Output (Linux only).')
         print(colored('\n -nc',rngColor())
             +',            '
@@ -370,7 +370,7 @@ def logResults(results: list, mode: str, host: str, filename: str) -> bool:
         return False
 
 
-# Handler for KeyboardInterrupting queued tasks.
+# Handler for KeyboardInterrupting threaded tasks.
 exiting = threading.Event()
 def signalHandler(signum,frame):
     exiting.set()
@@ -428,7 +428,7 @@ for i in range(1,len(args)):
         else:
             wordlist = open(f'{args[i+1]}',encoding='latin-1').read()
             state['wordlist_bool'] = True
-    elif args[i] == '-nr' or args[i].lower() == '--no-rainbow':
+    elif args[i] == '-nl' or args[i].lower() == '--no-lolcat':
         state['no_lolcat'] = True
     elif args[i] == '-O' or args[i].lower() == '--out-file':
         if i == (len(args)-1) or args[i+1].startswith('-'):
@@ -616,7 +616,7 @@ def printBanner() -> None:
     global state
     if platform.system() == 'Linux':
         import subprocess
-        funny_gato = subprocess.call(['which','lolcat'],stdout=subprocess.DEVNULL)
+        funny_gato = subprocess.call(['which','lolcat'],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         if funny_gato == 0 and not state['no_lolcat']:
             state['lolcat'] = True
@@ -1040,9 +1040,8 @@ def zenBuster() -> None:
                         +colored('.',rngColor())+colored(']','red')
                         +colored(' Cleaning up Running Threads and Preparing Gathered Results..             \n',rngColor()))  
 
-    # After our threads are finished:
+        # After our threads are finished:
         reportResults(start_time)
-
     except KeyboardInterrupt:
         killColor()
         die(0)
