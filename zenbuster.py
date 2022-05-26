@@ -798,9 +798,9 @@ def enumDirectories(enumerator:str) -> None:
             with lock:
                 if not state['quiet']:
                     enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
+                    location_item = r.url.split("//")[1].replace(f"{host}","")
                     if state['no_color']:
                         if r.history:
-                            location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                             print('[+] Endpoint Found: ',end='')
                             print(f'{enum_item_fmt} ({r.history[0].status_code}) ->',end='')
                             print(f' {location_item} ({r.status_code})'.ljust(width()))
@@ -808,7 +808,6 @@ def enumDirectories(enumerator:str) -> None:
                             print(f' [+] Endpoint Found: {enum_item_fmt} ({r.status_code})'.ljust(width()))
                     else:
                         if r.history:
-                            location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
                                 +colored(']','blue',attrs=['bold'])
@@ -860,16 +859,15 @@ def enumDirectories(enumerator:str) -> None:
                     with lock:
                         if not state['quiet']:
                             enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
+                            location_item = r.url.split("//")[1].replace(f"{host}","")
                             if state['no_color']:
                                 if r.history:
-                                    location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                                     print('[+] Endpoint Found: ',end='')
                                     print(f'{enum_item_fmt}.{ext} ({r.history[0].status_code}) -> {location_item} ({r.status_code})'.ljust(width()))
                                 else:
                                     print(f' [+] Endpoint Found: {enum_item_fmt}.{ext} ({r.status_code})'.ljust(width()))
                             else:
                                 if r.history:
-                                    location_item = r.history[-1].headers["location"].split("//")[1].replace(f"{host}","")
                                     print(colored(' [','blue',attrs=['bold'])
                                         +colored('+','green',attrs=['bold'])
                                         +colored(']','blue',attrs=['bold'])
