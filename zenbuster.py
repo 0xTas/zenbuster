@@ -131,7 +131,8 @@ try:
 except ImportError:
     try:
         os.system('cls') if platform.system() == 'Windows' else os.system('clear')
-        cont = input('\n ZenBuster relies on the Python module "requests" to function. Would you like to install it now?  [Y/N]: ')
+        cont = input('\n ZenBuster relies on the Python module "requests" to function.'
+            ' Would you like to install it now?  [Y/N]: ')
 
         if cont.lower() == 'y': 
             try:
@@ -148,14 +149,17 @@ except ImportError:
             except KeyboardInterrupt:
                 raise SystemExit(0)
             except Exception as err:
-                print(f'{err}\n\n Could not import critical module "requests"! script will now exit..')
+                print(f'{err}\n\n Could not import critical module "requests"!'
+                    ' script will now exit..')
                 raise SystemExit(1)
         else:
-            print(f' Could not import critical module "requests", script will now exit..')
+            print(f' Could not import critical module "requests",'
+                ' script will now exit..')
             raise SystemExit(1)
         os.system('cls') if platform.system() == 'Windows' else os.system('clear')
     except Exception as err:
-        print(f' {err}\n Could not import critical module "requests"! Script will now exit..')
+        print(f' {err}\n Could not import critical module "requests"!'
+            ' Script will now exit..')
         raise SystemExit(1)
 
 
@@ -169,14 +173,16 @@ os.system('cls') if platform.system() == 'Windows' else os.system('clear')
 try:
     from termcolor import colored
 except ImportError:
-    cont = input('\n Termcolor module is not installed, would you like to install it now?  [Y/N]: ')
+    cont = input('\n Termcolor module is not installed, '
+        'would you like to install it now?  [Y/N]: ')
 
     if cont.lower() == 'y':
         try:
             import subprocess
             subprocess.call(['python3','-m','pip','install','termcolor'])
 
-            # Solution from: https://stackoverflow.com/questions/56974185/import-runtime-installed-module-using-pip-in-python-3
+            # Solution from: 
+            # https://stackoverflow.com/questions/56974185/import-runtime-installed-module-using-pip-in-python-3
             from site import getusersitepackages
             user_site = getusersitepackages()
 
@@ -185,11 +191,13 @@ except ImportError:
             from termcolor import colored
             sleep(2)
         except Exception as err:
-            print(f'{err}\n\n Could not import module Termcolor, script will not output color..')
+            print(f'{err}\n\n Could not import module Termcolor, '
+                'script will not output color..')
             state['no_color'] = True
             sleep(4.20)
     else:
-        print(f' Could not import module Termcolor, script will not output color..')
+        print(f' Could not import module Termcolor, '
+            'script will not output color..')
         state['no_color'] = True
         sleep(4.20)
 
@@ -199,7 +207,8 @@ if platform.system() == 'Windows' and not state['no_color']:
     try:
         from colorama import init, deinit
     except ImportError:
-        cont = input('\n Colorama module is not installed, would you like to install it now?  [Y/N]: ')
+        cont = input('\n Colorama module is not installed,'
+            ' would you like to install it now?  [Y/N]: ')
 
         if cont.lower() == 'y': 
             try:
@@ -215,11 +224,13 @@ if platform.system() == 'Windows' and not state['no_color']:
                 from colorama import init, deinit
                 sleep(2)
             except Exception as err:
-                print(f'{err}\n\n Could not import module Colorama, script will not output color..')
+                print(f'{err}\n\n Could not import module Colorama,'
+                    ' script will not output color..')
                 state['no_color'] = True
                 sleep(4.20)
         else:
-            print(f' Could not import module Colorama, script will not output color..')
+            print(f' Could not import module Colorama,'
+                ' script will not output color..')
             state['no_color'] = True
             sleep(4.20)
 os.system('cls') if platform.system() == 'Windows' else os.system('clear')
@@ -258,7 +269,8 @@ def zero_X(hexx: int) -> bool:
     try:
         hexxx = hex(hexx)[2:]
         hexxxx = hex(hexx)[:2].encode().hex()
-        if (bytearray.fromhex(hexxxx).decode()+bytearray.fromhex(hexxx).decode()) == '0xTas': return True
+        if (bytearray.fromhex(hexxxx).decode()
+            +bytearray.fromhex(hexxx).decode()) == '0xTas': return True
         return False
     except:
         return False
@@ -289,7 +301,6 @@ def validateHost(hostname: str) -> bool:
             clearScreen()
             return True
         except Exception as err:
-            print(f' Unable to parse hostname/URL: ({hostname}). Host may be unreachable, or perhaps a typo?.')
             return False
 
 
@@ -301,12 +312,16 @@ def zenHelp() -> None:
         print('\n -s,             --ssl:  Forces Usage of HTTPS.')
         print('\n -u <URL/IP>,    --host: Host to Target for Scan.')
         print('\n -w <filepath>,  --wordlist: Path to Dictionary File.')
-        print('\n -p <port>,      --port: Custom Port Option for Nonstandard Webservers.')
-        print('\n -x <extensions>, --ext: Comma-Separated File Extensions (Dir mode only).')
-        print('\n -O [filename],  --out-file: Log Results to a File (Accepts Custom Name/Path).')
+        print('\n -p <port>,      --port: '
+            'Custom Port Option for Nonstandard Webservers.')
+        print('\n -x <extensions>, --ext: '
+            'Comma-Separated File Extensions (Dir mode only).')
+        print('\n -O [filename],  --out-file: '
+            'Log Results to File (Accepts Custom Name/Path).')
         print('\n -v,             --verbose: Verbose Terminal/Log Output.')
         print('\n -Q,             --quiet: Minimal Terminal Output.')
-        print('\n -nl,            --no-lolcat: Disables lolcat Output (Linux only).')
+        print('\n -nl,            --no-lolcat: '
+            'Disables lolcat Output (Linux only).')
         print('\n -nc,            --no-color: Disables Colored Output.')
     else:
         print(colored('\n Zen',rngColor(),attrs=['bold'])
@@ -342,7 +357,7 @@ def zenHelp() -> None:
         print(colored('\n -O',rngColor())
             +colored(' [filename]',rngColor())
             +','+colored('  --out-file',rngColor())
-            +': Log Results to a File (Accepts Custom Name/Path).')
+            +': Log Results to File (Accepts Custom Name/Path).')
         print(colored('\n -v',rngColor())
             +',             '
             +colored('--verbose',rngColor())
@@ -369,12 +384,18 @@ def logResults(results: list, mode: str, host: str, filename: str) -> bool:
     try:
         with open(f'{filename}','a') as log_file:
             if mode == 'Dirs':
-                log_file.write(f'Enumerated Directories for {host} at {log_time.date()} {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:{str(log_time.second).zfill(2)}:\n\n')
+                log_file.write(f'Enumerated Directories for {host} '
+                    f'at {log_time.date()}'
+                    f' {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:'
+                    f'{str(log_time.second).zfill(2)}:\n\n')
                 for result in results:
                     log_file.write(f'{result}\n')
                 log_file.write('\n')
             else:
-                log_file.write(f'Enumerated Subdomains for {host} at {log_time.date()} {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:{str(log_time.second).zfill(2)}:\n\n')
+                log_file.write(f'Enumerated Subdomains for {host} '
+                    f'at {log_time.date()}'
+                    f' {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:'
+                    f'{str(log_time.second).zfill(2)}:\n\n')
                 for result in results:
                     log_file.write(f'{result}\n')
                 log_file.write('\n')
@@ -426,12 +447,14 @@ for i in range(1,len(args)):
             try:
                 port = args[i+1]
                 if int(port) not in range(1,65536):
-                    print(f' Invalid Port Number: {port}! \nFalling back to defaults..')
+                    print(f' Invalid Port Number: {port}!')
+                    print(' Falling back to defaults..')
                     port = None
                     sleep(2)
                     clearScreen()
             except ValueError:
-                print(f' Provided port: {port} is not a valid integer!\n Falling back to defaults..')
+                print(f' Provided port: {port} is not a valid integer!')
+                print(' Falling back to defaults..')
                 port = None
                 sleep(2)
                 clearScreen()
@@ -474,7 +497,8 @@ tasks_complete = 0
 lock = threading.Lock()
 if log_filename == None: log_filename = 'zenResults.log'
 ignored_codes = [c for c in range(500,600)]; ignored_codes.append(404)
-headers = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
+headers = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
 
 # Defaults to interactive mode to populate host/wordlist if not correctly supplied up-front.
 # Skips this process altogether if dry_run or help-mode are called.
@@ -484,7 +508,8 @@ if not state['dry_run'] and not state['assistance']:
         try:
             if state['no_color']:
                 print(' Default Mode for ZenBuster is Subdomain Enumeration.')
-                answer = input('\n Would you like to switch this behavior to Directory Enumeration now?  [Y/N]: ')
+                answer = input('\n Would you like to switch this behavior to'
+                    ' Directory Enumeration now?  [Y/N]: ')
             else:
                 print(' Default Mode for '
                     +colored('Zen',rngColor(),attrs=['bold'])
@@ -523,7 +548,9 @@ if not state['dry_run'] and not state['assistance']:
                     total_tasks *= len(extensions)
         except:
             if state['no_color']:
-                print(' [!] Please provide a valid wordlist file.\n Example: "./subdomains.py -w /usr/share/wordlists/subdomains.txt".')
+                print(' [!] Please provide a valid wordlist file.')
+                print(' Example: '
+                    '"./subdomains.py -w /usr/share/wordlists/subdomains.txt".')
             else:
                 print(colored(' [','yellow',attrs=['bold'])
                     +colored('!','red',attrs=['bold'])
@@ -532,7 +559,8 @@ if not state['dry_run'] and not state['assistance']:
                     +colored('[','yellow',attrs=['bold'])
                     +colored('!','red',attrs=['bold'])
                     +colored(']','yellow',attrs=['bold']))
-                print(' Example: "./subdomains.py -w /usr/share/wordlists/subdomains.txt".')
+                print(' Example: '
+                    '"./subdomains.py -w /usr/share/wordlists/subdomains.txt".')
             killColor()
             die(1)
     else:
@@ -568,7 +596,8 @@ if not state['dry_run'] and not state['assistance']:
         except:
             if state['no_color']:
                 print(' [!] Please provide a valid wordlist file. [!]')
-                print(' Example: "./subdomains.py -w /usr/share/wordlists/subdomains.txt"')
+                print(' Example: '
+                    '"./subdomains.py -w /usr/share/wordlists/subdomains.txt"')
             else:
                 print(colored(' [','yellow',attrs=['bold'])
                     +colored('!','red',attrs=['bold'])
@@ -592,7 +621,8 @@ if not state['dry_run'] and not state['assistance']:
                 if validateHost(host):
                     clearScreen()
                 else:
-                    print(f' Unable to parse hostname/URL: ({host}). Host may be unreachable, or perhaps contains a typo?.')
+                    print(f' Unable to parse hostname/URL: ({host}). '
+                        'Host may be unreachable, or perhaps contains a typo?.')
                     killColor()
                     die(1)
             except KeyboardInterrupt:
@@ -611,7 +641,8 @@ if not state['dry_run'] and not state['assistance']:
                 if validateHost(host):
                     clearScreen()
                 else:
-                    print(f' Unable to parse hostname/URL: ({host}). Host may be unreachable, or perhaps a typo?.')
+                    print(f' Unable to parse hostname/URL: ({host}). '
+                        'Host may be unreachable, or perhaps a typo?.')
                     killColor()
                     die(1)
             except KeyboardInterrupt:
@@ -635,7 +666,8 @@ def printBanner() -> None:
     global state
     if platform.system() == 'Linux':
         import subprocess
-        funny_gato = subprocess.call(['which','lolcat'],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        funny_gato = subprocess.call(['which','lolcat'],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         if funny_gato == 0 and not state['no_lolcat']:
             state['lolcat'] = True
@@ -660,39 +692,48 @@ def printBanner() -> None:
         os.system('lolcat zenBanner.txt; rm zenBanner.txt')
         print('\n')
         if state['assistance']:
-            os.system('echo " Assistance Mode                      URL Enumerator By: 0xTas" | lolcat')
+            os.system('echo " Assistance Mode                      '
+                'URL Enumerator By: 0xTas" | lolcat')
         elif state['directory_mode']:
-            os.system('echo " Directory Mode                       URL Enumerator By: 0xTas" | lolcat')
+            os.system('echo " Directory Mode                       '
+                'URL Enumerator By: 0xTas" | lolcat')
         else:
-            os.system('echo " Subdomain Mode                       URL Enumerator By: 0xTas" | lolcat')
-        os.system('echo "-----------------------------------------------------------------" | lolcat')
+            os.system('echo " Subdomain Mode                       '
+                'URL Enumerator By: 0xTas" | lolcat')
+        os.system('echo '
+            '"-----------------------------------------------------------------"'
+            ' | lolcat')
     else:
         # Initialize color output if on Windows
         if platform.system() == 'Windows' and not state['no_color']: init()
         print(colored(rngBanner(),rngColor()))
 
         if state['assistance']:
-            print(colored(' Assistance Mode                        URL Enumerator By: ',rngColor())
+            print(colored(' Assistance Mode                        '
+                'URL Enumerator By: ',rngColor())
                 +colored('0','blue',attrs=['bold'])
                 +colored('x','magenta',attrs=['bold'])
                 +colored('T','green')
                 +colored('a','cyan')
                 +colored('s','red'))
         elif state['directory_mode']:
-            print(colored(' Directory Mode                         URL Enumerator By: ',rngColor())
+            print(colored(' Directory Mode                         '
+                'URL Enumerator By: ',rngColor())
                 +colored('0','blue',attrs=['bold'])
                 +colored('x','magenta',attrs=['bold'])
                 +colored('T','green')
                 +colored('a','cyan')
                 +colored('s','red'))
         else:
-            print(colored(' Subdomain Mode                         URL Enumerator By: ',rngColor())
+            print(colored(' Subdomain Mode                         '
+                'URL Enumerator By: ',rngColor())
                 +colored('0','blue',attrs=['bold'])
                 +colored('x','magenta',attrs=['bold'])
                 +colored('T','green')
                 +colored('a','cyan')
                 +colored('s','red'))
-        print(colored('-----------------------------------------------------------------',rngColor()))
+        print(colored('-----------------------------------------------------------------'
+            ,rngColor()))
 
 
 ###################################
@@ -717,7 +758,7 @@ def enumSubdomains(enumerator:str) -> None:
             enum_item = f'http://{enumerator}.{host}'
 
     try:
-        r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
+        r = requests.get(enum_item, headers=headers, stream=True, timeout=5)
     except:
         return
     else:
@@ -731,17 +772,22 @@ def enumSubdomains(enumerator:str) -> None:
                 if not state['quiet']:
 
                     if state['no_color']:
-                        print(f' [+]Subdomain Found: {enum_item.split("//")[1]} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
+                        print(f' [+]Subdomain Found: {enum_item.split("//")[1]} '
+                            f'{f"[{r_length}] " if verbose else ""}'
+                            f'({r.status_code})'.ljust(width()))
                     else:
                         print(colored(' [','blue',attrs=['bold'])
                             +colored('+','green',attrs=['bold'])
                             +colored(']','blue',attrs=['bold'])
                             +'Subdomain Found: '
-                            +colored(f'{enum_item.split("//")[1]}','cyan',attrs=['bold','underline'])
+                            +colored(f'{enum_item.split("//")[1]}',
+                                'cyan',attrs=['bold','underline'])
                             +f' {f"[{r_length}] " if verbose else ""}('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
                             +')'.ljust(width()))
-                enumerated.append(f'{enum_item} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
+                enumerated.append(f'{enum_item} '
+                    f'{f"[Len: {r_length}] " if verbose else ""}'
+                    f'({r.status_code})')
 
 
 def enumDirectories(enumerator:str) -> None:
@@ -765,7 +811,7 @@ def enumDirectories(enumerator:str) -> None:
         return
 
     try:
-        r = requests.get(enum_item, headers=headers, stream=True, timeout=5, allow_redirects=True)
+        r = requests.get(enum_item, headers=headers, stream=True, timeout=5)
     except:
         pass # Pass here instead of return so our extensions loop below still runs if applicable
     else:
@@ -780,42 +826,60 @@ def enumDirectories(enumerator:str) -> None:
                     if state['no_color']:
                         if r.history:
                             print('[+]Endpoint Found: ',end='')
-                            print(f'{enum_item_fmt} {f"[{r_length}] " if verbose else ""}({r.history[0].status_code}) ->',end='')
-                            print(f' {location_item} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
+                            print(f'{enum_item_fmt} '
+                                f'{f"[{r_length}] " if verbose else ""}'
+                                f'({r.history[0].status_code}) ->',end='')
+                            print(f' {location_item} '
+                                f'{f"[{r_length}] " if verbose else ""}'
+                                f'({r.status_code})'.ljust(width()))
                         else:
-                            print(f' [+]Endpoint Found: {enum_item_fmt} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
+                            print(f' [+]Endpoint Found: {enum_item_fmt} '
+                                f'{f"[{r_length}] " if verbose else ""}'
+                                f'({r.status_code})'.ljust(width()))
                     else:
                         if r.history:
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
                                 +colored(']','blue',attrs=['bold'])
                                 +'Endpoint Found: '
-                                +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
+                                +colored(f'{enum_item_fmt}',
+                                    'cyan',attrs=['bold','underline'])
                                 +f' {f"[{r_length}] " if verbose else ""}('
-                                +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
+                                +colored(f'{r.history[0].status_code}',
+                                    rngColor(),attrs=['bold'])+')'
                                 +colored(' -> ',rngColor())
-                                +colored(f'{location_item}','cyan',attrs=['bold','underline'])
+                                +colored(f'{location_item}',
+                                    'cyan',attrs=['bold','underline'])
                                 +f' {f"[{r_length}] " if verbose else ""}('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
+                                +colored(f'{r.status_code}',
+                                    'green',attrs=['bold'])+')'.ljust(width()))
                         else:
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
                                 +colored(']','blue',attrs=['bold'])
                                 +'Endpoint Found: '
-                                +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
+                                +colored(f'{enum_item_fmt}',
+                                    'cyan',attrs=['bold','underline'])
                                 +f' {f"[{r_length}] " if verbose else ""}('
-                                +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))   
+                                +colored(f'{r.status_code}',
+                                    'green',attrs=['bold'])+')'.ljust(width()))   
                 if r.history:
-                    enumerated.append(f'{enum_item} {f"[Len: {r_length}] " if verbose else ""}({r.history[0].status_code}) -> {r.url} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
+                    enumerated.append(f'{enum_item} '
+                        f'{f"[Len: {r_length}] " if verbose else ""}'
+                        f'({r.history[0].status_code})'
+                        f' -> {r.url} {f"[Len: {r_length}] " if verbose else ""}'
+                        f'({r.status_code})')
                 else:
-                    enumerated.append(f'{enum_item} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
+                    enumerated.append(f'{enum_item} '
+                        f'{f"[Len: {r_length}] " if verbose else ""}'
+                        f'({r.status_code})')
 
     # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
         for ext in extensions:
             if f'.{ext}' in enumerator: return # Avoid duplicate scans.
             try:
-                r = requests.get(f'{enum_item}.{ext}', headers=headers,stream=True, timeout=5, allow_redirects=True)
+                r = requests.get(f'{enum_item}.{ext}', headers=headers,stream=True, timeout=5)
             except:
                 return # Now we can return, there's nothing else to do.
             else:
@@ -830,22 +894,33 @@ def enumDirectories(enumerator:str) -> None:
                             if state['no_color']:
                                 if r.history:
                                     print('[+]Endpoint Found: ',end='')
-                                    print(f'{enum_item_fmt}.{ext} {f"[{r_length}] " if verbose else ""}({r.history[0].status_code}) -> {location_item} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
+                                    print(f'{enum_item_fmt}.{ext} '
+                                        f'{f"[{r_length}] " if verbose else ""}'
+                                        f'({r.history[0].status_code}) '
+                                        f'-> {location_item} {f"[{r_length}] " if verbose else ""}'
+                                        f'({r.status_code})'.ljust(width()))
                                 else:
-                                    print(f' [+]Endpoint Found: {enum_item_fmt}.{ext} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
+                                    print(f' [+]Endpoint Found: {enum_item_fmt}.{ext} '
+                                        f'{f"[{r_length}] " if verbose else ""}'
+                                        f'({r.status_code})'.ljust(width()))
                             else:
                                 if r.history:
                                     print(colored(' [','blue',attrs=['bold'])
                                         +colored('+','green',attrs=['bold'])
                                         +colored(']','blue',attrs=['bold'])
                                         +'Endpoint Found: '
-                                        +colored(f'{enum_item_fmt}.{ext}','cyan',attrs=['bold','underline'])
+                                        +colored(f'{enum_item_fmt}.{ext}',
+                                            'cyan',attrs=['bold','underline'])
                                         +f' {f"[{r_length}] " if verbose else ""}('
-                                        +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
-                                        +colored(' -> ',rngColor())
-                                        +colored(f'{location_item}','cyan',attrs=['bold','underline'])
+                                        +colored(f'{r.history[0].status_code}',
+                                            rngColor(),attrs=['bold'])
+                                        +')'+colored(' -> ',rngColor())
+                                        +colored(f'{location_item}',
+                                            'cyan',attrs=['bold','underline'])
                                         +f' {f"[{r_length}] " if verbose else ""}('
-                                        +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
+                                        +colored(f'{r.status_code}',
+                                            'green',attrs=['bold'])
+                                        +')'.ljust(width()))
                                 else:
                                     print(colored(' [','blue',attrs=['bold'])
                                         +colored('+','green',attrs=['bold'])
@@ -857,9 +932,15 @@ def enumDirectories(enumerator:str) -> None:
                                         +colored(f'{r.status_code}','green',
                                         attrs=['bold'])+')'.ljust(width()))
                         if r.history:
-                            enumerated.append(f'{enum_item}.{ext} {f"[Len: {r_length}] " if verbose else ""}({r.history[0].status_code}) -> {r.url} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} '
+                                f'{f"[Len: {r_length}] " if verbose else ""}'
+                                f'({r.history[0].status_code}) '
+                                f'-> {r.url} {f"[Len: {r_length}] " if verbose else ""}'
+                                f'({r.status_code})')
                         else:
-                            enumerated.append(f'{enum_item}.{ext} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} '
+                                f'{f"[Len: {r_length}] " if verbose else ""}'
+                                f'({r.status_code})')
 
 
 #####################################
@@ -878,10 +959,12 @@ def taskProgress(future) -> None:
     with lock:
         if state['no_color']:
             if not state['directory_mode']:
-                print(f' [~] Enumerating Subdomain {tasks_complete+1}/{total_tasks}. Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
+                print(f' [~] Enumerating Subdomain {tasks_complete+1}/{total_tasks}.'
+                    f' Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
                     end='\r',flush=True)
             else:
-                print(f' [~] Enumerating Directory {tasks_complete+1}/{total_tasks}. Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
+                print(f' [~] Enumerating Directory {tasks_complete+1}/{total_tasks}.'
+                    f' Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
                     end='\r',flush=True)
         else:
             if not state['directory_mode']:
@@ -914,26 +997,30 @@ def reportResults(time_started: datetime) -> None:
     elapsed_time = round(delta_time.total_seconds())
 
     results = [] # Remove duplicates from enumerated list.
-    [results.append(r) for r in enumerated if r not in results and r != f'http://{host}' and r != f'https://{host}']
+    [results.append(r) for r in enumerated if r not in results 
+        and r != f'http://{host}' and r != f'https://{host}']
 
     if state['log_results']:
         print('\n')
         if state['directory_mode']:
             if logResults(results, 'Dirs',f'{host}', log_filename):
-                print(f' {"(Verbose) " if state["verbose"] else ""}Results successfully logged to "{log_filename}"')
+                print(f' {"(Verbose) " if state["verbose"] else ""}'
+                    f'Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
         else:
             if logResults(results, 'Subs',f'{host}', log_filename):
-                print(f' {"(Verbose) " if state["verbose"] else ""}Results successfully logged to "{log_filename}"')
+                print(f' {"(Verbose) " if state["verbose"] else ""}'
+                    f'Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
 
     if state['no_color']:
-        print('\n')
         print(f' Finished Enumerating At: {end_time.date()} ',end='')
-        print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
-        print(f' Found {len(results)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
+        print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:'
+            f'{str(end_time.second).zfill(2)}.')
+        print(f' Found {len(results)} Valid Endpoints in '
+            f'{round(elapsed_time/60,2)} Minutes:\n')
         if results:
             for item in results:
                 print(' '+item)
@@ -942,10 +1029,11 @@ def reportResults(time_started: datetime) -> None:
         killColor()
         die(0)
     else: # Colored Output
-        print('\n')
         print(f' Finished Enumerating At: {end_time.date()} ',end='')
-        print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:{str(end_time.second).zfill(2)}.')
-        print(f' Found {len(results)} Valid Endpoints in {round(elapsed_time/60,2)} Minutes:\n')
+        print(f'{str(end_time.hour).zfill(2)}:{str(end_time.minute).zfill(2)}:'
+            f'{str(end_time.second).zfill(2)}.')
+        print(f' Found {len(results)} Valid Endpoints in '
+            f'{round(elapsed_time/60,2)} Minutes:\n')
         if results:
             for item in results:
                 if state['directory_mode'] and ' (30' in item:
@@ -998,7 +1086,9 @@ def zenBuster() -> None:
 
         with ThreadPoolExecutor() as executor:
             try:
-                futures = [executor.submit(enum_func, enumerator) for enumerator in enumerator_list]
+                futures = [executor.submit(enum_func, enumerator) 
+                    for enumerator in enumerator_list]
+
                 for future in futures:
                     future.add_done_callback(taskProgress)
                 while tasks_complete < total_tasks:
@@ -1020,11 +1110,13 @@ def zenBuster() -> None:
                     print(colored(' Preparing to Exit..'.ljust(width()),'red'))
                 executor.shutdown(wait=False,cancel_futures=True)
                 if state['no_color']:
-                    print('\n [..] Cleaning up Running Threads and Preparing Gathered Results..'.ljust(width()))
+                    print('\n [..] Cleaning up Running Threads '
+                        'and Preparing Gathered Results..'.ljust(width()))
                 else:
                     print(colored('\n [','red')+colored('.',rngColor())
                         +colored('.',rngColor())+colored(']','red')
-                        +colored(' Cleaning up Running Threads and Preparing Gathered Results..'.ljust(width()),rngColor()))  
+                        +colored(' Cleaning up Running Threads '
+                            'and Preparing Gathered Results..'.ljust(width()),rngColor()))  
 
         # After our threads are finished:
         reportResults(start_time)
