@@ -521,14 +521,14 @@ if not state['dry_run'] and not state['assistance']:
     if state['wordlist_bool']:
         try:
             enumerator_list = wordlist.splitlines()
-            list_length = len(enumerator_list)
+            total_tasks = len(enumerator_list)
             if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
-                    list_length *= 2
+                    total_tasks *= 2
                 elif len(extensions) == 2:
-                    list_length *= 3
+                    total_tasks *= 3
                 elif len(extensions) > 2:
-                    list_length *= len(extensions)
+                    total_tasks *= len(extensions)
         except:
             if state['no_color']:
                 print(' [!] Please provide a valid wordlist file.\n Example: "./subdomains.py -w /usr/share/wordlists/subdomains.txt".')
@@ -552,14 +552,14 @@ if not state['dry_run'] and not state['assistance']:
                         'blue',attrs=['bold'])),encoding='latin-1').read()
 
             enumerator_list = wordlist.splitlines()
-            list_length = len(enumerator_list)
+            total_tasks = len(enumerator_list)
             if state['directory_mode'] and state['extension_bool']:
                 if len(extensions) == 1:
-                    list_length *= 2
+                    total_tasks *= 2
                 elif len(extensions) == 2:
-                    list_length *= 3
+                    total_tasks *= 3
                 elif len(extensions) > 2:
-                    list_length *= len(extensions)
+                    total_tasks *= len(extensions)
             clearScreen()
         except KeyboardInterrupt:
             if state['no_color']:
@@ -887,28 +887,28 @@ def taskProgress(future) -> None:
     with lock:
         if state['no_color']:
             if not state['directory_mode']:
-                print(f' [~] Enumerating Subdomain {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
+                print(f' [~] Enumerating Subdomain {tasks_complete+1}/{total_tasks}. Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
                     end='\r',flush=True)
             else:
-                print(f' [~] Enumerating Directory {tasks_complete+1}/{list_length}. Progress: ~{round((tasks_complete/list_length)*100,2)}% Done.',
+                print(f' [~] Enumerating Directory {tasks_complete+1}/{total_tasks}. Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
                     end='\r',flush=True)
         else:
             if not state['directory_mode']:
                 print(colored(' [',rngColor())+colored('~',rngColor())
                     +colored(']',rngColor())+' Enumerating Subdomain '
                     +colored(f'{tasks_complete}','red')+'/'
-                    +colored(f'{list_length}','green')+'. Progress: '
+                    +colored(f'{total_tasks}','green')+'. Progress: '
                     +colored('~','cyan')
-                    +f'{round((tasks_complete/list_length)*100,2)}'
+                    +f'{round((tasks_complete/total_tasks)*100,2)}'
                     +colored('%','magenta')+' Done.',
                     end='\r',flush=True) 
             else:
                 print(colored(' [',rngColor())+colored('~',rngColor())
                     +colored(']',rngColor())+' Enumerating Directory '
                     +colored(f'{tasks_complete}','red')+'/'
-                    +colored(f'{list_length}','green')+'. Progress: '
+                    +colored(f'{total_tasks}','green')+'. Progress: '
                     +colored('~','cyan')
-                    +f'{round((tasks_complete/list_length)*100,2)}'
+                    +f'{round((tasks_complete/total_tasks)*100,2)}'
                     +colored('%','magenta')+' Done.',
                     end='\r',flush=True)
         tasks_complete += (len(extensions)+1)
@@ -1010,7 +1010,7 @@ def zenBuster() -> None:
                 futures = [executor.submit(enum_func, enumerator) for enumerator in enumerator_list]
                 for future in futures:
                     future.add_done_callback(taskProgress)
-                while tasks_complete < list_length:
+                while tasks_complete < total_tasks:
                     sleep(0.420)
             except KeyboardInterrupt:
                 exiting.set()
