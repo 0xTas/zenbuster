@@ -31,7 +31,7 @@ Personally, I have been using it to help me solve CTF challenges on platforms li
 
 ## License
 
-ZenBuster is licensed under the GNU GPLv3 License, [**see here**](https://github.com/0xTas/zenbuster/blob/main/LICENSE) for more information.
+ZenBuster is licensed under the GNU GPLv3 License, [**see here**](https://github.com/0xTas/zenbuster/blob/master/LICENSE) for more information.
 
 
 ## Credits
@@ -43,7 +43,7 @@ Modifications were made by me, when specified with: '*zg*'.
 
 # Showcase
 
-![ZenBuster](https://imgur.com/a/tHFMxCe "ZenBuster Help Page")
+![ZenBuster](https://i.imgur.com/tJgNB0S.png "ZenBuster Help Page")
 
 More to come...
 
@@ -65,9 +65,14 @@ ZenBuster relies on 3 external libraries to function, and it is recommended to i
 
 The modules that will be installed and their purposes are as follows:
 
-    1. [Python requests](https://pypi.org/project/requests/) **-** The backbone of each enumeration request. Without this, the script will not function.
-    2. [termcolor](https://pypi.org/project/termcolor/) **-** Enables colored terminal output. Non-critical, the script can still run without color if this is not present.
-    3. [colorama (Windows only)](https://pypi.org/project/colorama/) **-** Primes the Windows terminal to accept ANSI color codes (from Termcolor). Non-critical.
+1. [Python requests](https://pypi.org/project/requests/) 
+    - The backbone of each enumeration request. Without this, the script will not function.
+
+2. [termcolor](https://pypi.org/project/termcolor/) 
+    - Enables colored terminal output. Non-critical, the script can still run without color if this is not present.
+
+3. [colorama (Windows only)](https://pypi.org/project/colorama/) 
+    - Primes the Windows terminal to accept ANSI color codes (from Termcolor). Non-critical.
 
 These dependencies may be installed manually, with `pip` using requirements.txt, or via interaction with the script upon first run.
 
@@ -106,13 +111,13 @@ Short Flag    |Long Flag    |Purpose
 
 # Planned Features/Improvements
 
-[] Increased levels of optional verbosity.
-[] Allow optional throttling of task thread-count.
-[] Allow users to modify the list of ignored status codes.
-[] Allow greater user control over various request headers.
-[] Allow optional ignoring of responses based on content-length.
-[] Expand subdomain enumeration to include OSINT methods instead of just brute-forcing.
-[] Explore a more comprehensive and source-readable solution to fancy colored output (possibly using [rich](https://pypi.org/project/rich/)).
+- Increased levels of optional verbosity.
+- Allow optional throttling of task thread-count.
+- Allow users to modify the list of ignored status codes.
+- Allow greater user control over various request headers.
+- Allow optional ignoring of responses based on content-length.
+- Expand subdomain enumeration to include OSINT methods instead of just brute-forcing.
+- Explore a more comprehensive and source-readable solution to fancy colored output (possibly using [rich](https://pypi.org/project/rich/)).
 
 ---
 
