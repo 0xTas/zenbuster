@@ -254,6 +254,8 @@ def clearScreen() -> None:
 
 
 def opt_info(verbose: bool, optional_info: str) -> str:
+    # Allows dynamically inserting optional info into format strings based on program state,
+    # without excessively re-using entire blocks of print() functions for 'verbose' state.
     if not verbose:
         return ''
     else:
@@ -310,11 +312,10 @@ def zenHelp() -> None:
         print('\n -p <port>,      --port: Custom Port Option for Nonstandard Webservers.')
         print('\n -x <extensions>, --ext: Comma-Separated File Extensions (Dir mode only).')
         print('\n -O [filename],  --out-file: Log Results to a File (Accepts Custom Name/Path).')
-        print('\n -v,             --verbose: Verbose Terminal Output.')
+        print('\n -v,             --verbose: Verbose Terminal/Log Output.')
         print('\n -Q,             --quiet: Minimal Terminal Output.')
         print('\n -nl,            --no-lolcat: Disables lolcat Output (Linux only).')
         print('\n -nc,            --no-color: Disables Colored Output.')
-        print('\n -D,             --debug: Raises any Exceptions with Detailed Tracebacks.')
     else:
         print(colored('\n Zen',rngColor(),attrs=['bold'])
             +colored('Buster',rngColor(),attrs=['bold'])
@@ -353,7 +354,7 @@ def zenHelp() -> None:
         print(colored('\n -v',rngColor())
             +',             '
             +colored('--verbose',rngColor())
-            +': Verbose Terminal Output.')
+            +': Verbose Terminal/Log Output.')
         print(colored('\n -Q',rngColor())
             +',             '
             +colored('--quiet',rngColor())
@@ -366,10 +367,6 @@ def zenHelp() -> None:
             +',            '
             +colored('--no-color',rngColor())
             +': Disables Colored Output.')
-        print(colored('\n -D',rngColor())
-            +',             '
-            +colored('--debug',rngColor())
-            +': Raises any Exceptions with Detailed Tracebacks.')
     die(0)
 
 
