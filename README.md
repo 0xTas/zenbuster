@@ -101,9 +101,9 @@ Short Flag    |Long Flag    |Purpose
 -Q            |--quiet      |Minimal terminal output until final results
 -nc           |--no-color   |Disables colored terminal output
 -nl           |--no-lolcat  |Disables lolcat-printed banner (Linux only)
--u <hostname> |--host "     |Host to target for the scan
--w <wordlist> |--wordlist " |Path to wordlist/dictionary file
--x <exts>     |--ext "      |Comma-separated list of file extensions (Dirs only)
+-u \<hostname\> |--host "     |Host to target for the scan
+-w \<wordlist\> |--wordlist " |Path to wordlist/dictionary file
+-x \<exts\>     |--ext "      |Comma-separated list of file extensions (Dirs only)
 -p <port#>    |--port "     |Custom port option for nonstandard webservers
 -O [filename] |--out-file " |Log results to a file (accepts custom name/path)
 
