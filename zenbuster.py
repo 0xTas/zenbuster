@@ -262,7 +262,7 @@ def opt_info(verbose: bool, optional_info: str) -> str:
         return f'{optional_info} '
 
 
-def zeroX(hexx: int) -> bool:
+def zero_X(hexx: int) -> bool:
     try:
         hexxx = hex(hexx)[2:]
         hexxxx = hex(hexx)[:2].encode().hex()
@@ -1054,5 +1054,5 @@ def zenBuster() -> None:
             raise err
 
 
-if zeroX(__author__):
+if zero_X(__author__):
     zenBuster()
