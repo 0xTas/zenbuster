@@ -253,6 +253,13 @@ def clearScreen() -> None:
     os.system('cls') if platform.system() == 'Windows' else os.system('clear')
 
 
+def opt_info(verbose: bool, optional_info: str) -> str:
+    if not verbose:
+        return ''
+    else:
+        return f'{optional_info} '
+
+
 def zeroX(hexx: int) -> bool:
     try:
         hexxx = hex(hexx)[2:]
@@ -707,6 +714,7 @@ def enumSubdomains(enumerator:str) -> None:
     # Appends valid subdomains to enumerated list. 
     global enumerated
     if exiting.is_set(): return
+    verbosity = state['verbose']    
 
     if state['ssl']:
         if port != None:
@@ -728,25 +736,23 @@ def enumSubdomains(enumerator:str) -> None:
             return
         else:
             with lock:
+                r_length = str(len(r.content))
                 if r.history:
                     r.status_code = r.history[0].status_code
                 if not state['quiet']:
 
                     if state['no_color']:
-                        print(f' [+] Subdomain Found: {enum_item.split("//")[1]} ({r.status_code})'.ljust(width()))
+                        print(f' [+]Subdomain Found: {enum_item.split("//")[1]} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
                     else:
                         print(colored(' [','blue',attrs=['bold'])
                             +colored('+','green',attrs=['bold'])
                             +colored(']','blue',attrs=['bold'])
-                            +' Subdomain Found: '
+                            +'Subdomain Found: '
                             +colored(f'{enum_item.split("//")[1]}','cyan',attrs=['bold','underline'])
-                            +' ('
+                            +f' {opt_info(verbosity, f"[{r_length}]")}('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
                             +')'.ljust(width()))
-                if state['verbose']:
-                    enumerated.append(f'{enum_item}  [Len: {len(r.content)}] ({r.status_code})')
-                else:
-                    enumerated.append(f'{enum_item} ({r.status_code})')
+                enumerated.append(f'{enum_item} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
 
 
 def enumDirectories(enumerator:str) -> None:
@@ -754,6 +760,7 @@ def enumDirectories(enumerator:str) -> None:
     # Appends valid endpoints to enumerated list.
     global enumerated
     if exiting.is_set(): return
+    verbosity = state['verbose']
 
     if state['ssl'] and not '#' in enumerator:
         if port != None:
@@ -778,45 +785,41 @@ def enumDirectories(enumerator:str) -> None:
         else:
             with lock:
                 if not state['quiet']:
+                    r_length = str(len(r.content))
                     enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
                     location_item = r.url.split("//")[1].replace(f"{host}","")
                     if state['no_color']:
                         if r.history:
-                            print('[+] Endpoint Found: ',end='')
-                            print(f'{enum_item_fmt} ({r.history[0].status_code}) ->',end='')
-                            print(f' {location_item} ({r.status_code})'.ljust(width()))
+                            print('[+]Endpoint Found: ',end='')
+                            print(f'{enum_item_fmt} {opt_info(verbosity, f"[{r_length}]")}({r.history[0].status_code}) ->',end='')
+                            print(f' {location_item} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
                         else:
-                            print(f' [+] Endpoint Found: {enum_item_fmt} ({r.status_code})'.ljust(width()))
+                            print(f' [+]Endpoint Found: {enum_item_fmt} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
                     else:
                         if r.history:
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
                                 +colored(']','blue',attrs=['bold'])
-                                +' Endpoint Found: '
-                                +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])+' ('
+                                +'Endpoint Found: '
+                                +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
+                                +f' {opt_info(verbosity, f"[{r_length}]")}('
                                 +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
                                 +colored(' -> ',rngColor())
                                 +colored(f'{location_item}','cyan',attrs=['bold','underline'])
-                                +' ('
+                                +f' {opt_info(verbosity, f"[{r_length}]")}('
                                 +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
                         else:
                             print(colored(' [','blue',attrs=['bold'])
                                 +colored('+','green',attrs=['bold'])
                                 +colored(']','blue',attrs=['bold'])
-                                +' Endpoint Found: '
+                                +'Endpoint Found: '
                                 +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
-                                +' ('
+                                +f' {opt_info(verbosity, f"[{r_length}]")}('
                                 +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))   
-                if state['verbose']:
-                    if r.history:
-                        enumerated.append(f'{enum_item}  [Len: {len(r.content)}] ({r.history[0].status_code}) -> {r.url}  [Len: {len(r.content)}] ({r.status_code})')
-                    else:
-                        enumerated.append(f'{enum_item}  [Len: {len(r.content)}] ({r.status_code})')
+                if r.history:
+                    enumerated.append(f'{enum_item} {opt_info(verbosity, f"[Len: {r_length}]")}({r.history[0].status_code}) -> {r.url} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
                 else:
-                    if r.history:
-                        enumerated.append(f'{enum_item} ({r.history[0].status_code}) -> {r.url} ({r.status_code})')
-                    else:
-                        enumerated.append(f'{enum_item} ({r.status_code})')
+                    enumerated.append(f'{enum_item} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
 
     # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
@@ -832,45 +835,42 @@ def enumDirectories(enumerator:str) -> None:
                 else:
                     with lock:
                         if not state['quiet']:
+                            r_length = str(len(r.content))
                             enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
                             location_item = r.url.split("//")[1].replace(f"{host}","")
                             if state['no_color']:
                                 if r.history:
-                                    print('[+] Endpoint Found: ',end='')
-                                    print(f'{enum_item_fmt}.{ext} ({r.history[0].status_code}) -> {location_item} ({r.status_code})'.ljust(width()))
+                                    print('[+]Endpoint Found: ',end='')
+                                    print(f'{enum_item_fmt}.{ext} {opt_info(verbosity, f"[{r_length}]")}({r.history[0].status_code}) -> {location_item} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
                                 else:
-                                    print(f' [+] Endpoint Found: {enum_item_fmt}.{ext} ({r.status_code})'.ljust(width()))
+                                    print(f' [+]Endpoint Found: {enum_item_fmt}.{ext} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
                             else:
                                 if r.history:
                                     print(colored(' [','blue',attrs=['bold'])
                                         +colored('+','green',attrs=['bold'])
                                         +colored(']','blue',attrs=['bold'])
-                                        +' Endpoint Found: '
-                                        +colored(f'{enum_item_fmt}.{ext}','cyan',attrs=['bold','underline'])+' ('
+                                        +'Endpoint Found: '
+                                        +colored(f'{enum_item_fmt}.{ext}','cyan',attrs=['bold','underline'])
+                                        +f' {opt_info(verbosity, f"[{r_length}]")}('
                                         +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
                                         +colored(' -> ',rngColor())
                                         +colored(f'{location_item}','cyan',attrs=['bold','underline'])
-                                        +' ('
+                                        +f' {opt_info(verbosity, f"[{r_length}]")}('
                                         +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
                                 else:
                                     print(colored(' [','blue',attrs=['bold'])
                                         +colored('+','green',attrs=['bold'])
                                         +colored(']','blue',attrs=['bold'])+
-                                        ' Endpoint Found: '
+                                        'Endpoint Found: '
                                         +colored(f'{enum_item_fmt}.{ext}','cyan',
-                                        attrs=['bold','underline'])+' ('
+                                        attrs=['bold','underline'])
+                                        +f' {opt_info(verbosity, f"[{r_length}]")}('
                                         +colored(f'{r.status_code}','green',
                                         attrs=['bold'])+')'.ljust(width()))
-                        if state['verbose']:
-                            if r.history:
-                                enumerated.append(f'{enum_item}.{ext}  [Len: {len(r.content)}] ({r.history[0].status_code}) -> {r.url}  [Len: {len(r.content)}] ({r.status_code}) ')
-                            else:
-                                enumerated.append(f'{enum_item}.{ext}  [Len: {r.content}] ({r.status_code})')
+                        if r.history:
+                            enumerated.append(f'{enum_item}.{ext} {opt_info(verbosity, f"[Len: {r_length}]")}({r.history[0].status_code}) -> {r.url} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
                         else:
-                            if r.history:
-                                enumerated.append(f'{enum_item}.{ext} ({r.history[0].status_code}) -> {r.url} ({r.status_code})')
-                            else:
-                                enumerated.append(f'{enum_item}.{ext} ({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
 
 
 #####################################
@@ -932,12 +932,12 @@ def reportResults(time_started: datetime) -> None:
         print('\n')
         if state['directory_mode']:
             if logResults(results, 'Dirs',f'{host}', log_filename):
-                print(f' Results successfully logged to "{log_filename}"')
+                print(f' {opt_info(state["verbose"], "(Verbose)")}Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
         else:
             if logResults(results, 'Subs',f'{host}', log_filename):
-                print(f' Results successfully logged to "{log_filename}"')
+                print(f' {opt_info(state["verbose"], "(Verbose)")}Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
 
