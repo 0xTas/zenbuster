@@ -5,11 +5,12 @@
              #  Multi-Platform Multithreaded URL Enumeration  #
              #       Author: Zach Griffin, aka: 0xTas         #
              #            Email: admin@0xTas.dev              #
-             #           https://github.com/0xTas             #
+             #       Github: https://github.com/0xTas         #
+             #       Twitter: https://twitter.com/0xTas       #
              ##################################################
 
 ##############################################################################
-#                      © Copyright 2022 Zach Griffin                         #
+#                      Copyright © 2022 Zach Griffin                         #
 #                                                                            #
 #    This program is free software: you can redistribute it and/or modify    #
 #    it under the terms of the GNU General Public License as published by    #
@@ -251,15 +252,6 @@ def killColor() -> None:
 
 def clearScreen() -> None:
     os.system('cls') if platform.system() == 'Windows' else os.system('clear')
-
-
-def opt_info(verbose: bool, optional_info: str) -> str:
-    # Allows dynamically inserting optional info into format strings based on program state,
-    # without excessively re-using entire blocks of print() functions for 'verbose' state.
-    if not verbose:
-        return ''
-    else:
-        return f'{optional_info} '
 
 
 def zero_X(hexx: int) -> bool:
@@ -711,7 +703,7 @@ def enumSubdomains(enumerator:str) -> None:
     # Appends valid subdomains to enumerated list. 
     global enumerated
     if exiting.is_set(): return
-    verbosity = state['verbose']    
+    verbose = state['verbose']
 
     if state['ssl']:
         if port != None:
@@ -739,17 +731,17 @@ def enumSubdomains(enumerator:str) -> None:
                 if not state['quiet']:
 
                     if state['no_color']:
-                        print(f' [+]Subdomain Found: {enum_item.split("//")[1]} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
+                        print(f' [+]Subdomain Found: {enum_item.split("//")[1]} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
                     else:
                         print(colored(' [','blue',attrs=['bold'])
                             +colored('+','green',attrs=['bold'])
                             +colored(']','blue',attrs=['bold'])
                             +'Subdomain Found: '
                             +colored(f'{enum_item.split("//")[1]}','cyan',attrs=['bold','underline'])
-                            +f' {opt_info(verbosity, f"[{r_length}]")}('
+                            +f' {f"[{r_length}] " if verbose else ""}('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
                             +')'.ljust(width()))
-                enumerated.append(f'{enum_item} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
+                enumerated.append(f'{enum_item} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
 
 
 def enumDirectories(enumerator:str) -> None:
@@ -757,7 +749,7 @@ def enumDirectories(enumerator:str) -> None:
     # Appends valid endpoints to enumerated list.
     global enumerated
     if exiting.is_set(): return
-    verbosity = state['verbose']
+    verbose = state['verbose']
 
     if state['ssl'] and not '#' in enumerator:
         if port != None:
@@ -788,10 +780,10 @@ def enumDirectories(enumerator:str) -> None:
                     if state['no_color']:
                         if r.history:
                             print('[+]Endpoint Found: ',end='')
-                            print(f'{enum_item_fmt} {opt_info(verbosity, f"[{r_length}]")}({r.history[0].status_code}) ->',end='')
-                            print(f' {location_item} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
+                            print(f'{enum_item_fmt} {f"[{r_length}] " if verbose else ""}({r.history[0].status_code}) ->',end='')
+                            print(f' {location_item} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
                         else:
-                            print(f' [+]Endpoint Found: {enum_item_fmt} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
+                            print(f' [+]Endpoint Found: {enum_item_fmt} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
                     else:
                         if r.history:
                             print(colored(' [','blue',attrs=['bold'])
@@ -799,11 +791,11 @@ def enumDirectories(enumerator:str) -> None:
                                 +colored(']','blue',attrs=['bold'])
                                 +'Endpoint Found: '
                                 +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
-                                +f' {opt_info(verbosity, f"[{r_length}]")}('
+                                +f' {f"[{r_length}] " if verbose else ""}('
                                 +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
                                 +colored(' -> ',rngColor())
                                 +colored(f'{location_item}','cyan',attrs=['bold','underline'])
-                                +f' {opt_info(verbosity, f"[{r_length}]")}('
+                                +f' {f"[{r_length}] " if verbose else ""}('
                                 +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
                         else:
                             print(colored(' [','blue',attrs=['bold'])
@@ -811,12 +803,12 @@ def enumDirectories(enumerator:str) -> None:
                                 +colored(']','blue',attrs=['bold'])
                                 +'Endpoint Found: '
                                 +colored(f'{enum_item_fmt}','cyan',attrs=['bold','underline'])
-                                +f' {opt_info(verbosity, f"[{r_length}]")}('
+                                +f' {f"[{r_length}] " if verbose else ""}('
                                 +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))   
                 if r.history:
-                    enumerated.append(f'{enum_item} {opt_info(verbosity, f"[Len: {r_length}]")}({r.history[0].status_code}) -> {r.url} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
+                    enumerated.append(f'{enum_item} {f"[Len: {r_length}] " if verbose else ""}({r.history[0].status_code}) -> {r.url} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
                 else:
-                    enumerated.append(f'{enum_item} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
+                    enumerated.append(f'{enum_item} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
 
     # Loops over enumerator with requested file extensions.
     if state['extension_bool']:
@@ -838,9 +830,9 @@ def enumDirectories(enumerator:str) -> None:
                             if state['no_color']:
                                 if r.history:
                                     print('[+]Endpoint Found: ',end='')
-                                    print(f'{enum_item_fmt}.{ext} {opt_info(verbosity, f"[{r_length}]")}({r.history[0].status_code}) -> {location_item} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
+                                    print(f'{enum_item_fmt}.{ext} {f"[{r_length}] " if verbose else ""}({r.history[0].status_code}) -> {location_item} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
                                 else:
-                                    print(f' [+]Endpoint Found: {enum_item_fmt}.{ext} {opt_info(verbosity, f"[{r_length}]")}({r.status_code})'.ljust(width()))
+                                    print(f' [+]Endpoint Found: {enum_item_fmt}.{ext} {f"[{r_length}] " if verbose else ""}({r.status_code})'.ljust(width()))
                             else:
                                 if r.history:
                                     print(colored(' [','blue',attrs=['bold'])
@@ -848,11 +840,11 @@ def enumDirectories(enumerator:str) -> None:
                                         +colored(']','blue',attrs=['bold'])
                                         +'Endpoint Found: '
                                         +colored(f'{enum_item_fmt}.{ext}','cyan',attrs=['bold','underline'])
-                                        +f' {opt_info(verbosity, f"[{r_length}]")}('
+                                        +f' {f"[{r_length}] " if verbose else ""}('
                                         +colored(f'{r.history[0].status_code}',rngColor(),attrs=['bold'])+')'
                                         +colored(' -> ',rngColor())
                                         +colored(f'{location_item}','cyan',attrs=['bold','underline'])
-                                        +f' {opt_info(verbosity, f"[{r_length}]")}('
+                                        +f' {f"[{r_length}] " if verbose else ""}('
                                         +colored(f'{r.status_code}','green',attrs=['bold'])+')'.ljust(width()))
                                 else:
                                     print(colored(' [','blue',attrs=['bold'])
@@ -861,13 +853,13 @@ def enumDirectories(enumerator:str) -> None:
                                         'Endpoint Found: '
                                         +colored(f'{enum_item_fmt}.{ext}','cyan',
                                         attrs=['bold','underline'])
-                                        +f' {opt_info(verbosity, f"[{r_length}]")}('
+                                        +f' {f"[{r_length}] " if verbose else ""}('
                                         +colored(f'{r.status_code}','green',
                                         attrs=['bold'])+')'.ljust(width()))
                         if r.history:
-                            enumerated.append(f'{enum_item}.{ext} {opt_info(verbosity, f"[Len: {r_length}]")}({r.history[0].status_code}) -> {r.url} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} {f"[Len: {r_length}] " if verbose else ""}({r.history[0].status_code}) -> {r.url} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
                         else:
-                            enumerated.append(f'{enum_item}.{ext} {opt_info(verbosity, f"[Len: {r_length}]")}({r.status_code})')
+                            enumerated.append(f'{enum_item}.{ext} {f"[Len: {r_length}] " if verbose else ""}({r.status_code})')
 
 
 #####################################
@@ -928,12 +920,12 @@ def reportResults(time_started: datetime) -> None:
         print('\n')
         if state['directory_mode']:
             if logResults(results, 'Dirs',f'{host}', log_filename):
-                print(f' {opt_info(state["verbose"], "(Verbose)")}Results successfully logged to "{log_filename}"')
+                print(f' {"(Verbose) " if state["verbose"] else ""}Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
         else:
             if logResults(results, 'Subs',f'{host}', log_filename):
-                print(f' {opt_info(state["verbose"], "(Verbose)")}Results successfully logged to "{log_filename}"')
+                print(f' {"(Verbose) " if state["verbose"] else ""}Results successfully logged to "{log_filename}"')
             else:
                 print(' [!] Could not log results to a file!')
 
