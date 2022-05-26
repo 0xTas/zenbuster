@@ -875,8 +875,7 @@ def enumDirectories(enumerator:str) -> None:
 #####################################
 def taskProgress(future) -> None:
     # Tracks and reports progress for each task in the thread pool.
-    # Prints numerical progress if not verbose mode:
-    # (Verbose progreess reporting is handled by Enum Funcs).
+    # Prints numerical progress based on tasks_complete/total_tasks.
     # Modifies 'tasks_complete' for both local and global use.
     global tasks_complete
     if exiting.is_set():
