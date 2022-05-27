@@ -40,7 +40,10 @@ Personally, I have been using it to help me solve CTF challenges on platforms li
 
 
 ## License
-![GitHub](https://img.shields.io/github/license/0xTas/zenbuster?color=%2352E2E0&label=License&logo=GNU&logoColor=%23FFFFFF&style=flat-square)
+<p align="center">
+    <a href="https://github.com/0xTas/zenbuster/blob/master/LICENSE">
+        <img alt="GNU GPL-3.0" src="https://img.shields.io/github/license/0xTas/zenbuster?color=%2352E2E0&label=License&logo=GNU&logoColor=%23FFFFFF&style=flat-square"></a>
+</p>
 
 ZenBuster is licensed under the GNU GPLv3 License, [**see here**](https://github.com/0xTas/zenbuster/blob/master/LICENSE) for more information.
 
