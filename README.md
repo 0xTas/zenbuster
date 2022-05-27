@@ -1,9 +1,20 @@
 # About
-
-![GitHub last commit](https://img.shields.io/github/last-commit/0xTas/zenbuster?color=%2352E29A&label=Last%20Commit&logo=Github&logoColor=%2352E29A&style=flat-square)
-![GitHub repo size](https://img.shields.io/github/repo-size/0xtas/zenbuster?color=%235CA4FF&label=Repo%20Size&logo=Github&logoColor=D09AFE&style=flat-square)
-![Twitter Follow](https://img.shields.io/twitter/follow/0xTas?color=52E29A&label=%400xTas&logo=Twitter&style=flat-square)
-![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UChYfKpUc7POZvknfqfNDdJw?color=FF5CB2&label=Subscribers&logo=Youtube&logoColor=3EC2FB&style=flat-square)
+<p align="center">
+    <a href="https://github.com/0xTas/zenbuster/commits/master">
+        <img alt="GitHub Commits" src="https://img.shields.io/github/last-commit/0xTas/zenbuster?color=%2352E29A&label=Last%20Commit&logo=Github&logoColor=%2352E29A&style=flat-square"></a>
+</p>
+<p align="center">
+    <a href="https://github.com/0xTas/zenbuster/archive/refs/heads/master.zip">
+        <img alt="GitHub Download" src="https://img.shields.io/github/repo-size/0xTas/zenbuster?color=3EC2FB&label=Download%20Repo&logo=Github&logoColor=FF89F1&style=flat-square"></a>
+</p>
+<p align="center">
+    <a href="https://twitter.com/0xTas/">
+        <img alt="0xTas Twitter" src="https://img.shields.io/twitter/follow/0xTas?color=52E29A&label=%400xTas&logo=Twitter&style=flat-square"></a>
+</p>
+<p align="center">
+    <a href="https://www.youtube.com/tasmainia300films">
+        <img alt="0xTas Youtube" src="https://img.shields.io/youtube/channel/subscribers/UChYfKpUc7POZvknfqfNDdJw?color=FF5CB2&label=Subscribers&logo=Youtube&logoColor=3EC2FB&style=flat-square"></a>
+</p>
 
 *ZenBuster is a multi-threaded, multi-platform URL enumeration tool written in Python by Zach Griffin* ([@0xTas](https://twitter.com/0xTas)).
 
