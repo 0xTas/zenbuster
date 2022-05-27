@@ -1,6 +1,6 @@
 # About
 
-*ZenBuster is a multi-threaded, multi-platform URL enumeration tool written in Python by me, Zach Griffin* ([@0xTas](https://twitter.com/0xTas)).
+*ZenBuster is a multi-threaded, multi-platform URL enumeration tool written in Python by Zach Griffin* ([@0xTas](https://twitter.com/0xTas)).
 
 I wrote this tool as a way to deepen my familiarity with Python, and to help increase my understanding of Cybersecurity tooling in general.
 ZenBuster may not be the fastest or most comprehensive tool of its kind. It is however, simple to use, decently flexible, and in practice only marginally slower than other "tried-and-true" tools like Gobuster.

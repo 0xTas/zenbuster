@@ -958,33 +958,21 @@ def taskProgress(future) -> None:
 
     with lock:
         if state['no_color']:
-            if not state['directory_mode']:
-                print(f' [~] Enumerating Subdomain {tasks_complete+1}/{total_tasks}.'
-                    f' Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
-                    end='\r',flush=True)
-            else:
-                print(f' [~] Enumerating Directory {tasks_complete+1}/{total_tasks}.'
-                    f' Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
-                    end='\r',flush=True)
+            print(f' [~] Enumerating '
+                f'{"Directory" if state["directory_mode"] else "Subdomain"} '
+                f'{tasks_complete+1}/{total_tasks}.'
+                f' Progress: ~{round((tasks_complete/total_tasks)*100,2)}% Done.',
+                end='\r',flush=True)
         else:
-            if not state['directory_mode']:
-                print(colored(' [',rngColor())+colored('~',rngColor())
-                    +colored(']',rngColor())+' Enumerating Subdomain '
-                    +colored(f'{tasks_complete}','red')+'/'
-                    +colored(f'{total_tasks}','green')+'. Progress: '
-                    +colored('~','cyan')
-                    +f'{round((tasks_complete/total_tasks)*100,2)}'
-                    +colored('%','magenta')+' Done.',
-                    end='\r',flush=True) 
-            else:
-                print(colored(' [',rngColor())+colored('~',rngColor())
-                    +colored(']',rngColor())+' Enumerating Directory '
-                    +colored(f'{tasks_complete}','red')+'/'
-                    +colored(f'{total_tasks}','green')+'. Progress: '
-                    +colored('~','cyan')
-                    +f'{round((tasks_complete/total_tasks)*100,2)}'
-                    +colored('%','magenta')+' Done.',
-                    end='\r',flush=True)
+            print(colored(' [',rngColor())+colored('~',rngColor())
+                +colored(']',rngColor())
+                +f' Enumerating {"Directory" if state["directory_mode"] else "Subdomain"} '
+                +colored(f'{tasks_complete}','red')+'/'
+                +colored(f'{total_tasks}','green')+'. Progress: '
+                +colored('~','cyan')
+                +f'{round((tasks_complete/total_tasks)*100,2)}'
+                +colored('%','magenta')+' Done.',
+                end='\r',flush=True) 
         tasks_complete += (len(extensions)+1)
 
 
@@ -1001,19 +989,13 @@ def reportResults(time_started: datetime) -> None:
         and r != f'http://{host}' and r != f'https://{host}']
 
     if state['log_results']:
-        print()
-        if state['directory_mode']:
-            if logResults(results, 'Dirs',f'{host}', log_filename):
-                print(f' {"(Verbose) " if state["verbose"] else ""}'
-                    f'Results successfully logged to "{log_filename}"')
-            else:
-                print(' [!] Could not log results to a file!')
+        print('\n')
+        if logResults(results, f'{"Dirs" if state["directory_mode"] else "Subs"}',
+            f'{host}', log_filename):
+            print(f' {"(Verbose) " if state["verbose"] else ""}'
+                f'Results successfully logged to "{log_filename}"')
         else:
-            if logResults(results, 'Subs',f'{host}', log_filename):
-                print(f' {"(Verbose) " if state["verbose"] else ""}'
-                    f'Results successfully logged to "{log_filename}"')
-            else:
-                print(' [!] Could not log results to a file!')
+            print(' [!] Could not log results to a file!')
 
     if state['no_color']:
         print(f' Finished Enumerating At: {end_time.date()} ',end='')
@@ -1021,7 +1003,7 @@ def reportResults(time_started: datetime) -> None:
             f'{str(end_time.second).zfill(2)}.')
         print(f' Found {len(results)} Valid Endpoints in '
             f'{round(elapsed_time/60,2)} Minutes:'.ljust(width()))
-        print()
+        print('\n')
         if results:
             for item in results:
                 print(' '+item)
@@ -1068,23 +1050,18 @@ def zenBuster() -> None:
 
     try:
         start_time = datetime.now()
-        enum_func = enumSubdomains
+        enum_func = enumDirectories if state['directory_mode'] else enumSubdomains
 
-        if state['directory_mode']:
-            enum_func = enumDirectories
-            if state['no_color']:
-                print(f'\n Enumerating Directories for {host}\n')
-            else:
-                print(colored('\n Enumerating',rngColor())
-                    +colored(' Directories','green')+' for: '
-                    +colored(f'{host}',rngColor())+'\n')
+        if state['no_color']:
+            print('\n Enumerating '
+                f'{"Directories" if state["directory_mode"] else "Subdomains"}'
+                f' for {host}\n')
         else:
-            if state['no_color']:
-                print(f'\n Enumerating Subdomains for {host}\n')
-            else:
-                print(colored('\n Enumerating',rngColor())
-                    +colored(' Subdomains','green')+' for: '
-                    +colored(f'{host}',rngColor())+'\n')
+            print(colored('\n Enumerating',rngColor())
+                +colored(f' {"Directories" if state["directory_mode"] else "Subdomains"}',
+                    'green')
+                +' for: '
+                +colored(f'{host}',rngColor())+'\n')
 
         with ThreadPoolExecutor() as executor:
             try:
