@@ -1001,7 +1001,7 @@ def reportResults(time_started: datetime) -> None:
         and r != f'http://{host}' and r != f'https://{host}']
 
     if state['log_results']:
-        print('\n')
+        print()
         if state['directory_mode']:
             if logResults(results, 'Dirs',f'{host}', log_filename):
                 print(f' {"(Verbose) " if state["verbose"] else ""}'
