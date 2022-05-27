@@ -1,5 +1,10 @@
 # About
 
+![GitHub last commit](https://img.shields.io/github/last-commit/0xTas/zenbuster?color=%2352E29A&label=Last%20Commit&logo=Github&logoColor=%2352E29A&style=flat-square)
+![GitHub repo size](https://img.shields.io/github/repo-size/0xtas/zenbuster?color=%235CA4FF&label=Repo%20Size&logo=Github&logoColor=D09AFE&style=flat-square)
+![Twitter Follow](https://img.shields.io/twitter/follow/0xTas?color=52E29A&label=%400xTas&logo=Twitter&style=flat-square)
+![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UChYfKpUc7POZvknfqfNDdJw?color=FF5CB2&label=Subscribers&logo=Youtube&logoColor=3EC2FB&style=flat-square)
+
 *ZenBuster is a multi-threaded, multi-platform URL enumeration tool written in Python by Zach Griffin* ([@0xTas](https://twitter.com/0xTas)).
 
 I wrote this tool as a way to deepen my familiarity with Python, and to help increase my understanding of Cybersecurity tooling in general.
@@ -30,6 +35,7 @@ Personally, I have been using it to help me solve CTF challenges on platforms li
 
 
 ## License
+![GitHub](https://img.shields.io/github/license/0xTas/zenbuster?color=%2352E2E0&label=License&logo=GNU&logoColor=%23FFFFFF&style=flat-square)
 
 ZenBuster is licensed under the GNU GPLv3 License, [**see here**](https://github.com/0xTas/zenbuster/blob/master/LICENSE) for more information.
 
