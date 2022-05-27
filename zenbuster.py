@@ -416,7 +416,7 @@ for i in range(1,len(args)):
     if args[i] == '-x' or args[i].lower() == '--ext':
         state['extension_bool'] = True
         if i == (len(args)-1) or args[i+1].startswith('-'):
-            extensions = []
+            state['extension_bool'] = False
         else:
             extensions = args[i+1].split(',')
     elif args[i] == '-s' or args[i].lower() == '--ssl':
