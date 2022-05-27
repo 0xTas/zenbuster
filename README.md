@@ -107,6 +107,14 @@ Short Flag    |Long Flag    |Purpose
 -p <port#>    |--port "     |Custom port option for nonstandard webservers
 -O [filename] |--out-file " |Log results to a file (accepts custom name/path)
 
+### Example Usage
+
+`./zenbuster.py -d -w /usr/share/wordlists/dirb/common.txt -u target.thm -v`
+
+`python3 zenbuster.py -w ../subdomains.txt --host target.thm --ssl -O myResults.log`
+
+`zenbuster -w subdomains.txt -u target.thm --quiet` (With .bashrc alias)
+
 ---
 
 # Planned Features/Improvements
