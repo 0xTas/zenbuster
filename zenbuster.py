@@ -383,22 +383,13 @@ def logResults(results: list, mode: str, host: str, filename: str) -> bool:
     log_time = datetime.now()
     try:
         with open(f'{filename}','a') as log_file:
-            if mode == 'Dirs':
-                log_file.write(f'Enumerated Directories for {host} '
-                    f'at {log_time.date()}'
-                    f' {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:'
-                    f'{str(log_time.second).zfill(2)}:\n\n')
-                for result in results:
-                    log_file.write(f'{result}\n')
-                log_file.write('\n')
-            else:
-                log_file.write(f'Enumerated Subdomains for {host} '
-                    f'at {log_time.date()}'
-                    f' {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:'
-                    f'{str(log_time.second).zfill(2)}:\n\n')
-                for result in results:
-                    log_file.write(f'{result}\n')
-                log_file.write('\n')
+            log_file.write(f'Enumerated {"Directories" if mode == "Dirs" else "Subdomains"} for {host} '
+                f'at {log_time.date()}'
+                f' {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:'
+                f'{str(log_time.second).zfill(2)}:\n\n')
+            for result in results:
+                log_file.write(f'{result}\n')
+            log_file.write('\n')
         return True
     except Exception as err:
         if state['debug']:
