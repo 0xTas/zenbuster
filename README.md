@@ -147,3 +147,13 @@ Short Flag    |Long Flag    |Purpose
 
 - Enumerating long endpoints may result in ugly terminal output due to line-wraping on smaller console windows. *Logging to a file is recommended, especially on Windows.*
 - If target host is a vHost on a shared webserver, enumeration via IP may not function as expected. *Use domain/hostname instead.*
+
+---
+
+# Version
+<p align="center">
+    <a href="https://github.com/0xtas/zenbuster">
+        <img alt="ZenBuster Version" src="https://img.shields.io/badge/Version-1.0-blue"></a>
+</p>
+
+**ZenBuster is currently at version 1.0**
