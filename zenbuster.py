@@ -383,7 +383,8 @@ def logResults(results: list, mode: str, host: str, filename: str) -> bool:
     log_time = datetime.now()
     try:
         with open(f'{filename}','a') as log_file:
-            log_file.write(f'Enumerated {"Directories" if mode == "Dirs" else "Subdomains"} for {host} '
+            log_file.write(f'Enumerated '
+                f'{"Directories" if mode == "Dirs" else "Subdomains"} for {host} '
                 f'at {log_time.date()}'
                 f' {str(log_time.hour).zfill(2)}:{str(log_time.minute).zfill(2)}:'
                 f'{str(log_time.second).zfill(2)}:\n\n')
@@ -675,7 +676,7 @@ def printBanner() -> None:
             print(' Directory Mode                       URL Enumerator By: 0xTas')
         else:
             print(' Subdomain Mode                       URL Enumerator By: 0xTas')
-        print('-----------------------------------------------------------------')
+        print('-'*65)
     elif state['lolcat']:
         with open('zenBanner.txt','w') as banner_file:
             banner_file.write(rngBanner())
@@ -723,7 +724,7 @@ def printBanner() -> None:
                 +colored('T','green')
                 +colored('a','cyan')
                 +colored('s','red'))
-        print(colored('-----------------------------------------------------------------'
+        print(colored('-'*65
             ,rngColor()))
 
 
