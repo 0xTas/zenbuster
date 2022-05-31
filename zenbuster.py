@@ -420,6 +420,19 @@ for i in range(1,len(args)):
             state['extension_bool'] = False
         else:
             extensions = args[i+1].split(',')
+            try:
+                for x in range(i+2,len(args)):
+                    if args[x].startswith('-'):
+                        break
+                    elif not args[x].endswith(','):
+                        extensions.append(args[x])
+                        break
+                    else:
+                        extensions.append(args[x].replace(',',''))
+            except:
+                pass
+            finally:
+                extensions = [e for e in set(extensions) if e != '']
     elif args[i] == '-s' or args[i].lower() == '--ssl':
         state['ssl'] = True
     elif args[i] == '-d' or args[i].lower() == '--dirs':
