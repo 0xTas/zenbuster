@@ -240,6 +240,7 @@ os.system('cls') if platform.system() == 'Windows' else os.system('clear')
 #     Util Functions     #
 ##########################
 def die(code: int) -> None:
+    if platform.system() == 'Windows' and not state['no_color']: deinit()
     raise SystemExit(code)
 
 
@@ -255,10 +256,6 @@ def rngBanner() -> str:
 def rngColor() -> str:
     colors = ['green','red','blue','cyan','yellow','magenta']
     return random.choice(colors)
-
-
-def killColor() -> None:
-    if platform.system() == 'Windows' and not state['no_color']: deinit()
 
 
 def clearScreen() -> None:
@@ -534,7 +531,6 @@ if not state['dry_run'] and not state['assistance']:
                     +colored(']','yellow',attrs=['bold'])+' Caught '
                     +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. ')
                 print(colored(' Exiting..','red'))
-            killColor()
             die(0)
         if answer.lower() == 'y': state['directory_mode'] = True
         clearScreen()
@@ -566,7 +562,6 @@ if not state['dry_run'] and not state['assistance']:
                     +colored(']','yellow',attrs=['bold']))
                 print(' Example: '
                     '"./subdomains.py -w /usr/share/wordlists/subdomains.txt".')
-            killColor()
             die(1)
     else:
         try:
@@ -596,7 +591,6 @@ if not state['dry_run'] and not state['assistance']:
                     +' Caught '
                     +colored('KeyboardInterrupt','yellow',attrs=['bold'])+'. ')
                 print(colored(' Exiting..','red'))
-            killColor()
             die(0)
         except:
             if state['no_color']:
@@ -613,7 +607,6 @@ if not state['dry_run'] and not state['assistance']:
                     +colored(']','yellow',attrs=['bold']))
                 print(colored(' Example: ','green')
                     +'"./subdomains.py -w /usr/share/wordlists/subdomains.txt".')
-            killColor()
             die(1)
 
 
@@ -628,11 +621,9 @@ if not state['dry_run'] and not state['assistance']:
                 else:
                     print(f' Unable to parse hostname/URL: ({host}). '
                         'Host may be unreachable, or perhaps contains a typo?.')
-                    killColor()
                     die(1)
             except KeyboardInterrupt:
                 print('\n [!] Caught KeyboardInterrupt. [!]\n Exiting..')
-                killColor()
                 die(0)
         else:
             try:
@@ -648,7 +639,6 @@ if not state['dry_run'] and not state['assistance']:
                 else:
                     print(f' Unable to parse hostname/URL: ({host}). '
                         'Host may be unreachable, or perhaps a typo?.')
-                    killColor()
                     die(1)
             except KeyboardInterrupt:
                 print(colored('\n [','yellow',attrs=['bold'])
@@ -658,7 +648,6 @@ if not state['dry_run'] and not state['assistance']:
                     +colored('KeyboardInterrupt','yellow',attrs=['bold'])
                     +'. ')
                 print(colored(' Exiting..','red'))
-                killColor()
                 die(0)
 
 
@@ -1014,7 +1003,6 @@ def reportResults(time_started: datetime) -> None:
                 print(' '+item)
         else:
             print(' Nobody here but us chickens :(')
-        killColor()
         die(0)
     else: # Colored Output
         print(f' Finished Enumerating At: {end_time.date()} ',end='')
@@ -1039,7 +1027,6 @@ def reportResults(time_started: datetime) -> None:
                         +item[len(item)-1])
         else:
             print(' Nobody here but us chickens :(')
-        killColor()
         die(0)
 
 
@@ -1105,7 +1092,6 @@ def zenBuster() -> None:
         # After our threads are finished:
         reportResults(start_time)
     except KeyboardInterrupt:
-        killColor()
         die(0)
     except Exception as err:
         if state['no_color']:
@@ -1117,7 +1103,6 @@ def zenBuster() -> None:
                 +colored(f'[','red')
                 +colored('!','yellow')
                 +colored(']'.ljust(width()),'red'))
-            killColor()
             raise err
 
 
