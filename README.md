@@ -156,4 +156,4 @@ Short Flag    |Long Flag    |Purpose
         <img alt="ZenBuster Version" src="https://img.shields.io/badge/Version-1.0-blue"></a>
 </p>
 
-**ZenBuster is currently at version 1.0**
+**ZenBuster is currently at version 1.1**

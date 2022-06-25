@@ -33,7 +33,7 @@ banner = """
    dOOOO   (_)  \   |__  /___ _ __ | __ ) _   _ ___| |_ ___ _ __
   OOOOOb         |    / // _ \ '_ \|  _ \| | | / __| __/ _ \ '__|
   OOOOOOOb       |   / /|  __/ | | | |_) | |_| \__ \ ||  __/ | 
-  OOOOOOOOb      |  /____\___|_| |_|____/ \__,_|___/\__\___|_|v1.0
+  OOOOOOOOb      |  /____\___|_| |_|____/ \__,_|___/\__\___|_|v1.1
    OOO(_)OOb    /  
     YOOOOOY  _,'  
  jgs''-ooo-''      
@@ -52,7 +52,7 @@ banner2 = """
  \  ____  \ .'   |  | |  / _     \\          \ .'_ _   \ |  _ _   \           
  | |    \ | |    :  | | (`' )/`--' `--.  ,---'/ ( ` )   '| ( ' )  |           
  | |____/ / :   '_  | |(_ o _).       |   \  . (_ o _)  ||(_ o _) /           
- |   _ _ '. '   ( \.-.| (_,_). '.     :_ _:  |  (_,_)___|| (_,_).' __v1.0         
+ |   _ _ '. '   ( \.-.| (_,_). '.     :_ _:  |  (_,_)___|| (_,_).' __v1.1         
  |  ( ' )  \\' (`. _` /|.---.  \  :    (_I_)  '  \   .---.|  |\ \  |  |        
  | (_{;}_) || (_ (_) _)\    `-'  |   (_(=)_)  \  `-'    /|  | \ `'   /        
  |  (_,_)  / \ /  . \ / \       /     (_I_)    \       / |  |  \    /         
@@ -61,7 +61,7 @@ banner2 = """
 banner3 = """
           ,-,-.   ___       _                    
          / ( o \   _/ _ __ |_)    _ _|_ _  __     
-         \ o ) /  /__(/_| ||_)|_|_>  |_(/_ |  v1.0  
+         \ o ) /  /__(/_| ||_)|_|_>  |_(/_ |  v1.1  
        hjw`-'-'        
 """
 spooktober_banner = """
@@ -73,7 +73,7 @@ spooktober_banner = """
     OOOOOOOOb, '\  |  (_/   /  (|  '--. |  .     |/      
      OOO(_)OOb_)  /    /   /___ |  .--' |  |\    |       
       YOOOOOY  _,'    |        ||  `---.|  | \   |       
-    jgs''-ooo-''      `--------'`------'`--'  `--'v1.0       
+    jgs''-ooo-''      `--------'`------'`--'  `--'v1.1       
  .-. .-')                 .-')    .-') _     ('-.  _  .-')   
  \  ( OO )               ( OO ). (  OO) )  _(  OO)( \( -O )  
   ;-----.\  ,--. ,--.   (_)---\_)/     '._(,------.,------.  
@@ -121,7 +121,6 @@ import platform
 import threading
 from time import sleep
 from datetime import datetime
-from urllib.parse import urlparse
 from sys import argv as args, path
 from concurrent.futures import ThreadPoolExecutor
 
@@ -280,21 +279,40 @@ def validateHost(hostname: str) -> bool:
     global state, host
     print(' Validating Host...')
     try:
+        parts = [e for e in hostname.split('/') if e != '']
         if hostname.startswith('https'): state['ssl'] = True
         if hostname.startswith('http'):
-            hostname = urlparse(hostname).netloc
+            if state['directory_mode']:
+                hostname = parts[1]
             socket.gethostbyname(hostname)
-            host = hostname
+            if len(parts) > 2 and state['directory_mode']:
+                host = hostname + '/' + '/'.join(parts[2:])
+            else:
+                host = hostname
         elif hostname.replace('.','').isnumeric():
             host = socket.gethostbyaddr(host)[0]
+            if len(parts) > 1 and state['directory_mode']:
+                host = host + '/' + '/'.join(parts[1:])
         else:
+            if state['directory_mode']:
+                hostname = parts[0]
             socket.gethostbyname(hostname)
+            if len(parts) > 1 and state['directory_mode']:
+                host = f'{hostname}/{"/".join(parts[1:])}'
+            else:
+                host = hostname
         clearScreen()
         return True
     except:
         try:
+            if 'http' in parts[0]:
+                hostname = parts[1]
+            else:
+                hostname = parts[0]
             int(f'0x{hostname.replace(":","")}',16)
-            host = socket.gethostbyaddr(host)[0]
+            host = socket.gethostbyaddr(hostname)[0]
+            if len(parts) >= 2 and state['directory_mode']:
+                host = f'{host}/{"/".join(parts[2:]) if "http" in parts[0] else "/".join(parts[1:])}'
             clearScreen()
             return True
         except Exception as err:
