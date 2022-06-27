@@ -282,8 +282,7 @@ def validateHost(hostname: str) -> bool:
         parts = [e for e in hostname.split('/') if e != '']
         if hostname.startswith('https'): state['ssl'] = True
         if hostname.startswith('http'):
-            if state['directory_mode']:
-                hostname = parts[1]
+            hostname = parts[1]
             socket.gethostbyname(hostname)
             if len(parts) > 2 and state['directory_mode']:
                 host = hostname + '/' + '/'.join(parts[2:])
@@ -294,8 +293,7 @@ def validateHost(hostname: str) -> bool:
             if len(parts) > 1 and state['directory_mode']:
                 host = host + '/' + '/'.join(parts[1:])
         else:
-            if state['directory_mode']:
-                hostname = parts[0]
+            hostname = parts[0]
             socket.gethostbyname(hostname)
             if len(parts) > 1 and state['directory_mode']:
                 host = f'{hostname}/{"/".join(parts[1:])}'
