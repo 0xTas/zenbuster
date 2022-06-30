@@ -332,7 +332,7 @@ def zenHelp() -> None:
         print('\n -o [filename],  --out-file: '
             'Log Results to File (Accepts Custom Name/Path).')
         print('\n -v,             --verbose: Verbose Terminal/Log Output.')
-        print('\n -Q,             --quiet: Minimal Terminal Output.')
+        print('\n -q,             --quiet: Minimal Terminal Output.')
         print('\n -nl,            --no-lolcat: '
             'Disables lolcat Output (Linux only).')
         print('\n -nc,            --no-color: Disables Colored Output.')
@@ -375,7 +375,7 @@ def zenHelp() -> None:
             +',             '
             +colored('--verbose',rngColor())
             +': Verbose Terminal/Log Output.')
-        print(colored('\n -Q',rngColor())
+        print(colored('\n -q',rngColor())
             +',             '
             +colored('--quiet',rngColor())
             +': Minimal Terminal Output')
@@ -427,7 +427,7 @@ extensions = []
 log_filename = None
 for i in range(1,len(args)):
 
-    if args[i] == '-x' or args[i].lower() == '--ext':
+    if args[i].lower() == '-x' or args[i].lower() == '--ext':
         state['extension_bool'] = True
         if i == (len(args)-1) or args[i+1].startswith('-'):
             state['extension_bool'] = False
@@ -446,19 +446,19 @@ for i in range(1,len(args)):
                 pass
             finally:
                 extensions = [e for e in set(extensions) if e != '']
-    elif args[i] == '-s' or args[i].lower() == '--ssl':
+    elif args[i].lower() == '-s' or args[i].lower() == '--ssl':
         state['ssl'] = True
-    elif args[i] == '-d' or args[i].lower() == '--dirs':
+    elif args[i].lower() == '-d' or args[i].lower() == '--dirs':
         state['directory_mode'] = True
-    elif args[i] == '-h' or args[i].lower() == '--help':
+    elif args[i].lower() == '-h' or args[i].lower() == '--help':
         state['assistance'] = True
-    elif args[i] == '-u' or args[i].lower() == '--host':
+    elif args[i].lower() == '-u' or args[i].lower() == '--host':
         if i == (len(args)-1) or args[i+1].startswith('-'):
             state['host_bool'] = False
         else:
             host = args[i+1]
             state['host_bool'] = validateHost(host)
-    elif args[i] == '-p' or args[i].lower() == '--port':
+    elif args[i].lower() == '-p' or args[i].lower() == '--port':
         if i == (len(args)-1) or args[i+1].startswith('-'):
             port = None
         else:
@@ -476,17 +476,17 @@ for i in range(1,len(args)):
                 port = None
                 sleep(2)
                 clearScreen()
-    elif args[i] == '-v' or args[i].lower() == '--verbose':
+    elif args[i].lower() == '-v' or args[i].lower() == '--verbose':
         state['verbose'] = True
-    elif args[i] == '-dr' or args[i].lower() == '--dry-run':
+    elif args[i].lower() == '-dr' or args[i].lower() == '--dry-run':
         state['dry_run'] = True
-    elif args[i] == '-w' or args[i].lower() == '--wordlist':
+    elif args[i].lower() == '-w' or args[i].lower() == '--wordlist':
         if i == (len(args)-1) or args[i+1].startswith('-'):
             state['wordlist_bool'] = False
         else:
             wordlist = open(f'{args[i+1]}',encoding='latin-1').read()
             state['wordlist_bool'] = True
-    elif args[i] == '-nl' or args[i].lower() == '--no-lolcat':
+    elif args[i].lower() == '-nl' or args[i].lower() == '--no-lolcat':
         state['no_lolcat'] = True
     elif args[i].lower() == '-o' or args[i].lower() == '--out-file':
         if i == (len(args)-1) or args[i+1].startswith('-'):
@@ -494,9 +494,9 @@ for i in range(1,len(args)):
         else:
             log_filename = args[i+1]
         state['log_results'] = True
-    elif args[i] == '-Q' or args[i].lower() == '--quiet':
+    elif args[i].lower() == '-q' or args[i].lower() == '--quiet':
         state['quiet'] = True
-    elif args[i] == '-D' or args[i].lower() == '--debug':
+    elif args[i].lower() == '--debug':
         state['debug'] = True
 
 # Prevent misuse of extensions arg from breaking program logic further down..
