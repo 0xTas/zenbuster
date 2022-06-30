@@ -996,8 +996,8 @@ def reportResults(time_started: datetime) -> None:
 
     results = [] # Remove duplicates from enumerated list.
     [results.append(r) for r in enumerated if r not in results 
-        and r != f'http://{host}' and r != f'https://{host}'
-        and r != f'http://{host}/' and r != f'https://{host}/']
+        and f'http://{host}' not in r and f'https://{host}' not in r
+        and f'http://{host}/'not in r and f'https://{host}/' not in r]
 
     if state['log_results'] and results:
         print('\n')
