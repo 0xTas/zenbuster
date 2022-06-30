@@ -119,7 +119,7 @@ Short Flag    |Long Flag    |Purpose
 -w \<wordlist\> |--wordlist " |Path to wordlist/dictionary file
 -x \<exts\>     |--ext "      |Comma-separated list of file extensions (Dirs only)
 -p <port#>    |--port "     |Custom port option for nonstandard webservers
--O [filename] |--out-file " |Log results to a file (accepts custom name/path)
+-o [filename] |--out-file " |Log results to a file (accepts custom name/path)
 
 ### Example Usage
 
