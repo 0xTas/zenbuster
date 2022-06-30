@@ -329,7 +329,7 @@ def zenHelp() -> None:
             'Custom Port Option for Nonstandard Webservers.')
         print('\n -x <extensions>, --ext: '
             'Comma-Separated File Extensions (Dir mode only).')
-        print('\n -O [filename],  --out-file: '
+        print('\n -o [filename],  --out-file: '
             'Log Results to File (Accepts Custom Name/Path).')
         print('\n -v,             --verbose: Verbose Terminal/Log Output.')
         print('\n -Q,             --quiet: Minimal Terminal Output.')
@@ -367,7 +367,7 @@ def zenHelp() -> None:
             +colored('<extensions>',rngColor())
             +', '+colored('--ext',rngColor())
             +': Comma-Separated File Extensions (Dir mode only).')
-        print(colored('\n -O',rngColor())
+        print(colored('\n -o',rngColor())
             +colored(' [filename]',rngColor())
             +','+colored('  --out-file',rngColor())
             +': Log Results to File (Accepts Custom Name/Path).')
@@ -488,7 +488,7 @@ for i in range(1,len(args)):
             state['wordlist_bool'] = True
     elif args[i] == '-nl' or args[i].lower() == '--no-lolcat':
         state['no_lolcat'] = True
-    elif args[i] == '-O' or args[i].lower() == '--out-file':
+    elif args[i].lower() == '-o' or args[i].lower() == '--out-file':
         if i == (len(args)-1) or args[i+1].startswith('-'):
             pass
         else:
