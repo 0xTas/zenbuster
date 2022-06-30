@@ -112,14 +112,14 @@ Short Flag    |Long Flag    |Purpose
 -d            |--dirs       |Enables Directory Enumeration Mode
 -s            |-ssl         |Forces usage of HTTPS in requests
 -v            |--verbose    |Prints verbose info to terminal/log
--Q            |--quiet      |Minimal terminal output until final results
+-q            |--quiet      |Minimal terminal output until final results
 -nc           |--no-color   |Disables colored terminal output
 -nl           |--no-lolcat  |Disables lolcat-printed banner (Linux only)
--u \<hostname\> |--host "     |Host to target for the scan
--w \<wordlist\> |--wordlist " |Path to wordlist/dictionary file
--x \<exts\>     |--ext "      |Comma-separated list of file extensions (Dirs only)
--p <port#>    |--port "     |Custom port option for nonstandard webservers
--o [filename] |--out-file " |Log results to a file (accepts custom name/path)
+-u \<hostname\> |--host     |Host to target for the scan
+-w \<wordlist\> |--wordlist |Path to wordlist/dictionary file
+-x \<exts\>     |--ext      |Comma-separated list of file extensions (Dirs only)
+-p <port#>    |--port     |Custom port option for nonstandard webservers
+-o [filename] |--out-file |Log results to a file (accepts custom name/path)
 
 ### Example Usage
 
