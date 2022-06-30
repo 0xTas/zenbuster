@@ -996,9 +996,10 @@ def reportResults(time_started: datetime) -> None:
 
     results = [] # Remove duplicates from enumerated list.
     [results.append(r) for r in enumerated if r not in results 
-        and r != f'http://{host}' and r != f'https://{host}']
+        and r != f'http://{host}' and r != f'https://{host}'
+        and r != f'http://{host}/' and r != f'https://{host}/']
 
-    if state['log_results']:
+    if state['log_results'] and results:
         print('\n')
         if logResults(results, f'{"Dirs" if state["directory_mode"] else "Subs"}',
             f'{host}', log_filename):
