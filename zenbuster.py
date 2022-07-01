@@ -92,6 +92,7 @@ state = {
 'debug': False,
 'quiet': False,
 'lolcat': False,
+'nested': False,
 'verbose': False,
 'dry_run': False,
 'no_color': False,
@@ -275,8 +276,9 @@ def zero_X(hexx: int) -> bool:
 def validateHost(hostname: str) -> bool:
     # Checks validity of given host, with support for both
     # ipv4 and ipv6 formatting, plus auto SSL detection.
-    # Modifies "ssl" state flag, also "host", depending on given format.
-    global state, host
+    # Modifies "ssl" and "nested" state flags, 
+    # also "host", and "nested_dir" depending on given format.
+    global state, host, nested_dir
     print(' Validating Host...')
     try:
         parts = [e for e in hostname.split('/') if e != '']
@@ -285,18 +287,23 @@ def validateHost(hostname: str) -> bool:
             hostname = parts[1]
             socket.gethostbyname(hostname)
             if len(parts) > 2 and state['directory_mode']:
-                host = hostname + '/' + '/'.join(parts[2:])
+                state['nested'] = True
+                nested_dir = '/'+'/'.join(parts[2:])
+                host = hostname
             else:
                 host = hostname
         elif hostname.replace('.','').isnumeric():
             host = socket.gethostbyaddr(host)[0]
             if len(parts) > 1 and state['directory_mode']:
-                host = host + '/' + '/'.join(parts[1:])
+                state['nested'] = True
+                nested_dir = '/'+'/'.join(parts[1:])
         else:
             hostname = parts[0]
             socket.gethostbyname(hostname)
             if len(parts) > 1 and state['directory_mode']:
-                host = f'{hostname}/{"/".join(parts[1:])}'
+                state['nested'] = True
+                nested_dir = '/'+'/'.join(parts[1:])
+                host = f'{hostname}'
             else:
                 host = hostname
         clearScreen()
@@ -310,7 +317,8 @@ def validateHost(hostname: str) -> bool:
             int(f'0x{hostname.replace(":","")}',16)
             host = socket.gethostbyaddr(hostname)[0]
             if len(parts) >= 2 and state['directory_mode']:
-                host = f'{host}/{"/".join(parts[2:]) if "http" in parts[0] else "/".join(parts[1:])}'
+                state['nested'] = True
+                nested_dir = f'{"/"+"/".join(parts[2:]) if "http" in parts[0] else "/"+"/".join(parts[1:])}'
             clearScreen()
             return True
         except Exception as err:
@@ -423,7 +431,9 @@ signal.signal(signal.SIGTERM, signalHandler)
 ########################################
 #    Parse args for runtime options    #
 ########################################
+port = None
 extensions = []
+nested_dir = None
 log_filename = None
 for i in range(1,len(args)):
 
@@ -509,7 +519,6 @@ if state['verbose']:
 ################################
 #    Defining Critical Data    #
 ################################
-port = None
 enumerated = []
 tasks_complete = 0
 lock = threading.Lock()
@@ -780,9 +789,9 @@ def enumSubdomains(enumerator:str) -> None:
                 if r.history:
                     r.status_code = r.history[0].status_code
                 if not state['quiet']:
-
+                    endpoint = enum_item.split('//')[1]
                     if state['no_color']:
-                        print(f' [+]Subdomain Found: {enum_item.split("//")[1]} '
+                        print(f' [+]Subdomain Found: {endpoint} '
                             f'{f"[{r_length}] " if verbose else ""}'
                             f'({r.status_code})'.ljust(width()))
                     else:
@@ -790,7 +799,7 @@ def enumSubdomains(enumerator:str) -> None:
                             +colored('+','green',attrs=['bold'])
                             +colored(']','blue',attrs=['bold'])
                             +'Subdomain Found: '
-                            +colored(f'{enum_item.split("//")[1]}',
+                            +colored(f'{endpoint}',
                                 'cyan',attrs=['bold','underline'])
                             +f' {f"[{r_length}] " if verbose else ""}('
                             +colored(f'{r.status_code}','green',attrs=['bold'])
@@ -809,14 +818,14 @@ def enumDirectories(enumerator:str) -> None:
 
     if state['ssl'] and not '#' in enumerator:
         if port != None:
-            enum_item = f'https://{host}:{port}/{enumerator}'
+            enum_item = f'https://{host}:{port}{nested_dir if state["nested"] else ""}/{enumerator}'
         else:
-            enum_item = f'https://{host}/{enumerator}'
+            enum_item = f'https://{host}{nested_dir if state["nested"] else ""}/{enumerator}'
     elif not state['ssl'] and not '#' in enumerator:
         if port != None:
-            enum_item = f'http://{host}:{port}/{enumerator}'
+            enum_item = f'http://{host}:{port}{nested_dir if state["nested"] else ""}/{enumerator}'
         else:
-            enum_item = f'http://{host}/{enumerator}'
+            enum_item = f'http://{host}{nested_dir if state["nested"] else ""}/{enumerator}'
     else:
         return
 
@@ -831,8 +840,8 @@ def enumDirectories(enumerator:str) -> None:
             with lock:
                 if not state['quiet']:
                     r_length = str(len(r.content))
-                    enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
-                    location_item = r.url.split("//")[1].replace(f"{host}","")
+                    enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","").replace(f":{port}","")
+                    location_item = r.url.split("//")[1].replace(f"{host}","").replace(f":{port}","")
                     if state['no_color']:
                         if r.history:
                             print('[+]Endpoint Found: ',end='')
@@ -899,8 +908,8 @@ def enumDirectories(enumerator:str) -> None:
                     with lock:
                         if not state['quiet']:
                             r_length = str(len(r.content))
-                            enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","")
-                            location_item = r.url.split("//")[1].replace(f"{host}","")
+                            enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","").replace(f":{port}","")
+                            location_item = r.url.split("//")[1].replace(f"{host}","").replace(f":{port}","")
                             if state['no_color']:
                                 if r.history:
                                     print('[+]Endpoint Found: ',end='')
@@ -994,10 +1003,18 @@ def reportResults(time_started: datetime) -> None:
     delta_time = end_time - time_started
     elapsed_time = round(delta_time.total_seconds())
 
-    results = [] # Remove duplicates from enumerated list.
+    # Blacklist removes redundant/implied entries from results
+    # Avoids creating log files with just the base URL that you already knew about.
+    blacklist = [f'http://{host}', f'https://{host}', f'http://{host}/',
+                f'https://{host}/', f'http://{host}:{port}',f'https://{host}:{port}',
+                f'http://{host}:{port}/', f'https://{host}:{port}/', f'http://{host}{nested_dir}',
+                f'https://{host}{nested_dir}', f'http://{host}{nested_dir}/', f'https://{host}{nested_dir}/',
+                f'http://{host}:{port}{nested_dir}', f'https://{host}:{port}{nested_dir}',
+                f'http://{host}:{port}{nested_dir}/', f'https://{host}:{port}{nested_dir}/']
+
+    results = [] # Removing duplicates from enumerated list.
     [results.append(r) for r in enumerated if r not in results 
-        and f'http://{host}' not in r and f'https://{host}' not in r
-        and f'http://{host}/'not in r and f'https://{host}/' not in r]
+        and r.split()[0] not in blacklist]
 
     if state['log_results'] and results:
         print('\n')
@@ -1064,13 +1081,16 @@ def zenBuster() -> None:
         if state['no_color']:
             print('\n Enumerating '
                 f'{"Directories" if state["directory_mode"] else "Subdomains"}'
-                f' for {host}\n')
+                f' for {host+nested_dir if state["nested"] else host} '
+                f'{" Port: "+port if port != None else ""}\n')
         else:
             print(colored('\n Enumerating',rngColor())
                 +colored(f' {"Directories" if state["directory_mode"] else "Subdomains"}',
                     'green')
                 +' for: '
-                +colored(f'{host}',rngColor())+'\n')
+                +colored(f'{host+nested_dir if state["nested"] else host}',
+                rngColor())
+                +colored(f'{" Port: "+port if port != None else ""}',rngColor())+'\n')
 
         with ThreadPoolExecutor() as executor:
             try:
