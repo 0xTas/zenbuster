@@ -155,7 +155,7 @@ Short Flag    |Long Flag    |Purpose
 # Version
 <p align="center">
     <a href="https://github.com/0xtas/zenbuster">
-        <img alt="ZenBuster Version" src="https://img.shields.io/badge/Version-1.1-blue"></a>
+        <img alt="ZenBuster Version" src="https://img.shields.io/badge/Version-1.2-blue"></a>
 </p>
 
-**ZenBuster is currently at version 1.1**
+**ZenBuster is currently at version 1.2**
