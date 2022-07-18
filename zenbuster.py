@@ -105,10 +105,10 @@ state = {
 'directory_mode': False,
 }
 
-# Any funcs that modify this global state object
-# -are marked at the top of their scope with "global state".
-# Furthermore, any funcs that include side-effects are marked
-# -at the top of their scope with the 'global' declaration.
+"""Any funcs that modify this global state object
+are marked at the top of their scope with "global state".
+Furthermore, any funcs that include side-effects are marked
+at the top of their scope with the 'global' declaration."""
 
 
 ##########################
@@ -140,8 +140,8 @@ except ImportError:
                 subprocess.call(['python3','-m','pip','install','requests'])
                 from site import getusersitepackages as user_site
 
-                # Dynamically import packages that have been installed 
-                # at runtime by appending them to our path
+                """Dynamically import packages that have been installed 
+                at runtime by appending them to our path"""
                 if user_site not in path:
                     path.append(user_site)
                 import requests
@@ -274,10 +274,10 @@ def zero_X(hexx: int) -> bool:
 
 
 def validateHost(hostname: str) -> bool:
-    # Checks validity of given host, with support for both
-    # ipv4 and ipv6 formatting, plus auto SSL detection.
-    # Modifies "ssl" and "nested" state flags, 
-    # also "host", and "nested_dir" depending on given format.
+    """Checks validity of given host, with support for both
+    ipv4 and ipv6 formatting, plus auto SSL detection.
+    Modifies "ssl" and "nested" state flags, 
+    also "host", and "nested_dir" depending on given format."""
     global state, host, nested_dir
     print(' Validating Host...')
     try:
@@ -466,6 +466,11 @@ for i in range(1,len(args)):
         if i == (len(args)-1) or args[i+1].startswith('-'):
             state['host_bool'] = False
         else:
+            """Statement below fixes issue where specifying dir-mode flag *after* the host flag
+            fails to trigger nested-dir logic because the global state hasn't been set
+            properly before the call to validateHost()."""
+            if '-d' in map(str.lower, args) or '--dirs' in map(str.lower, args):
+                state['directory_mode'] = True
             host = args[i+1]
             state['host_bool'] = validateHost(host)
     elif args[i].lower() == '-p' or args[i].lower() == '--port':
