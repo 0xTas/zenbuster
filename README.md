@@ -22,12 +22,13 @@ Personally, I have been using it to help me solve CTF challenges on platforms li
 - *Both methods of enumeration require use of an appropriate wordlist or dictionary file.*
 - **Features Include:**
     1. Hostname format supports standard, IPv4, and IPv6.
-    2. Support for logging results to a file with *-O [filename]*.
+    2. Support for logging results to a file with *-o [filename]*.
     3. Specifying custom ports for nonstandard webservers with *-p <port>*.
     4. Optional file extensions in directory mode with *-x <extensions>*.
-    5. Quiet mode for less distracting output with *-Q*.
-    6. Color can be disabled for less distracting output with *-nc*/*-nl*.
-    7. **Tested on Python versions 3.9 and 3.10, with theoretical support for versions >= 3.6**
+    5. Quiet mode for less distracting output with *-q*.
+    6. Color can be disabled for less distracting output with *-nc* / *-nl*.
+    7. Add to the list of http status codes to ignore (default 5xx, 404) with *-ic*.
+    8. **Tested on Python versions 3.9 and 3.10, with theoretical support for versions >= 3.6**
 
 
 ## CAUTION/DISCLAIMER
@@ -115,6 +116,7 @@ Short Flag    |Long Flag    |Purpose
 -q            |--quiet      |Minimal terminal output until final results
 -nc           |--no-color   |Disables colored terminal output
 -nl           |--no-lolcat  |Disables lolcat-printed banner (Linux only)
+-ic \<codes\> |--ignore-codes |List of status codes to exclude from results.
 -u \<hostname\> |--host     |Host to target for the scan
 -w \<wordlist\> |--wordlist |Path to wordlist/dictionary file
 -x \<exts\>     |--ext      |Comma-separated list of file extensions (Dirs only)
@@ -127,7 +129,7 @@ Short Flag    |Long Flag    |Purpose
 
 `python3 zenbuster.py -w ../subdomains.txt --host target.thm --ssl -O myResults.log`
 
-`zenbuster -w subdomains.txt -u target.thm --quiet` (With .bashrc alias)
+`zenbuster -w subdomains.txt -u target.thm --quiet -ic 400, 403` (With .bashrc alias)
 
 ---
 
@@ -135,7 +137,7 @@ Short Flag    |Long Flag    |Purpose
 
 - Increased levels of optional verbosity.
 - Allow optional throttling of task thread-count.
-- Allow users to modify the list of ignored status codes.
+- ~~Allow users to modify the list of ignored status codes.~~ **DONE.**
 - Allow greater user control over various request headers.
 - Allow optional ignoring of responses based on content-length.
 - Expand subdomain enumeration to include OSINT methods instead of just brute-forcing.
