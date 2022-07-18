@@ -344,6 +344,7 @@ def zenHelp() -> None:
         print('\n -nl,            --no-lolcat: '
             'Disables lolcat Output (Linux only).')
         print('\n -nc,            --no-color: Disables Colored Output.')
+        print('\n -ic <codes>,    --ignore-codes: List of Status Codes to Exclude.')
     else:
         print(colored('\n Zen',rngColor(),attrs=['bold'])
             +colored('Buster',rngColor(),attrs=['bold'])
@@ -395,6 +396,10 @@ def zenHelp() -> None:
             +',            '
             +colored('--no-color',rngColor())
             +': Disables Colored Output.')
+        print(colored('\n -ic',rngColor())
+            +colored(' <codes>',rngColor())
+            +',    '+colored('--ignore-codes',rngColor())
+            +': List of Status Codes to Exclude.')
     die(0)
 
 
@@ -435,13 +440,14 @@ port = None
 extensions = []
 nested_dir = None
 log_filename = None
+excluded_codes = []
 for i in range(1,len(args)):
 
     if args[i].lower() == '-x' or args[i].lower() == '--ext':
-        state['extension_bool'] = True
         if i == (len(args)-1) or args[i+1].startswith('-'):
-            state['extension_bool'] = False
+            pass
         else:
+            state['extension_bool'] = True
             extensions = args[i+1].split(',')
             try:
                 for x in range(i+2,len(args)):
@@ -513,6 +519,27 @@ for i in range(1,len(args)):
         state['quiet'] = True
     elif args[i].lower() == '--debug':
         state['debug'] = True
+    elif args[i].lower() == '-ic' or args[i].lower() == '--ignore-codes':
+        if i == (len(args)-1) or args[i+1].startswith('-'):
+            pass
+        else:
+            excluded_codes = args[i+1].split(',')
+            try:
+                for c in range(i+2,len(args)):
+                    if args[c].startswith('-'):
+                        break
+                    elif not args[c].endswith(','):
+                        excluded_codes.append(args[c])
+                        break
+                    else:
+                        excluded_codes.append(args[c].replace(',',''))
+            except:
+                pass
+            finally:
+                # Remove NaN entries, duplicates, and empty strings.
+                excluded_codes = [''.join(n for n in x if n.isdigit()) for x in excluded_codes]
+                excluded_codes = [int(z) for z in set(excluded_codes) if z != '']
+
 
 # Prevent misuse of extensions arg from breaking program logic further down..
 if not state['directory_mode']:
@@ -529,6 +556,8 @@ tasks_complete = 0
 lock = threading.Lock()
 if log_filename == None: log_filename = 'zenResults.log'
 ignored_codes = [c for c in range(500,600)]; ignored_codes.append(404)
+if excluded_codes: ignored_codes.extend(excluded_codes)
+ignored_codes = [c for c in set(ignored_codes) if c != '']
 headers = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
 
@@ -1087,7 +1116,10 @@ def zenBuster() -> None:
             print('\n Enumerating '
                 f'{"Directories" if state["directory_mode"] else "Subdomains"}'
                 f' for {host+nested_dir if state["nested"] else host} '
-                f'{" Port: "+port if port != None else ""}\n')
+                f'{" Port: "+port if port != None else ""}\n'
+                f'{" Ignoring Status Codes: 5xx" if state["verbose"] else ""}'
+                f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")]) if state["verbose"] else ""}'
+                '\n')
         else:
             print(colored('\n Enumerating',rngColor())
                 +colored(f' {"Directories" if state["directory_mode"] else "Subdomains"}',
@@ -1095,7 +1127,11 @@ def zenBuster() -> None:
                 +' for: '
                 +colored(f'{host+nested_dir if state["nested"] else host}',
                 rngColor())
-                +colored(f'{" Port: "+port if port != None else ""}',rngColor())+'\n')
+                +colored(f'{" Port: "+port if port != None else ""}',rngColor())+'\n'
+                +colored(f' {"Ignoring Status Codes: " if state["verbose"] else ""}', 'red')
+                +f'{"5xx" if state["verbose"] else ""}'
+                f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")]) if state["verbose"] else ""}'
+                '\n')
 
         with ThreadPoolExecutor() as executor:
             try:
