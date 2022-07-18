@@ -133,6 +133,12 @@ Short Flag    |Long Flag    |Purpose
 
 ---
 
+# Updating
+
+Updating ZenBuster is easy! Just move into the installation folder (`cd zenbuster`) and `git pull`. That's it!
+
+---
+
 # Planned Features/Improvements
 
 - Increased levels of optional verbosity.
