@@ -33,7 +33,7 @@ banner = """
    dOOOO   (_)  \   |__  /___ _ __ | __ ) _   _ ___| |_ ___ _ __
   OOOOOb         |    / // _ \ '_ \|  _ \| | | / __| __/ _ \ '__|
   OOOOOOOb       |   / /|  __/ | | | |_) | |_| \__ \ ||  __/ | 
-  OOOOOOOOb      |  /____\___|_| |_|____/ \__,_|___/\__\___|_|v1.2
+  OOOOOOOOb      |  /____\___|_| |_|____/ \__,_|___/\__\___|_|v1.3
    OOO(_)OOb    /  
     YOOOOOY  _,'  
  jgs''-ooo-''      
@@ -52,7 +52,7 @@ banner2 = """
  \  ____  \ .'   |  | |  / _     \\          \ .'_ _   \ |  _ _   \           
  | |    \ | |    :  | | (`' )/`--' `--.  ,---'/ ( ` )   '| ( ' )  |           
  | |____/ / :   '_  | |(_ o _).       |   \  . (_ o _)  ||(_ o _) /           
- |   _ _ '. '   ( \.-.| (_,_). '.     :_ _:  |  (_,_)___|| (_,_).' __v1.2         
+ |   _ _ '. '   ( \.-.| (_,_). '.     :_ _:  |  (_,_)___|| (_,_).' __v1.3         
  |  ( ' )  \\' (`. _` /|.---.  \  :    (_I_)  '  \   .---.|  |\ \  |  |        
  | (_{;}_) || (_ (_) _)\    `-'  |   (_(=)_)  \  `-'    /|  | \ `'   /        
  |  (_,_)  / \ /  . \ / \       /     (_I_)    \       / |  |  \    /         
@@ -61,7 +61,7 @@ banner2 = """
 banner3 = """
           ,-,-.   ___       _                    
          / ( o \   _/ _ __ |_)    _ _|_ _  __     
-         \ o ) /  /__(/_| ||_)|_|_>  |_(/_ |  v1.2  
+         \ o ) /  /__(/_| ||_)|_|_>  |_(/_ |  v1.3  
        hjw`-'-'        
 """
 spooktober_banner = """
@@ -73,7 +73,7 @@ spooktober_banner = """
     OOOOOOOOb, '\  |  (_/   /  (|  '--. |  .     |/      
      OOO(_)OOb_)  /    /   /___ |  .--' |  |\    |       
       YOOOOOY  _,'    |        ||  `---.|  | \   |       
-    jgs''-ooo-''      `--------'`------'`--'  `--'v1.2       
+    jgs''-ooo-''      `--------'`------'`--'  `--'v1.3       
  .-. .-')                 .-')    .-') _     ('-.  _  .-')   
  \  ( OO )               ( OO ). (  OO) )  _(  OO)( \( -O )  
   ;-----.\  ,--. ,--.   (_)---\_)/     '._(,------.,------.  
@@ -339,12 +339,13 @@ def zenHelp() -> None:
             'Comma-Separated File Extensions (Dir mode only).')
         print('\n -o [filename],  --out-file: '
             'Log Results to File (Accepts Custom Name/Path).')
-        print('\n -v,             --verbose: Verbose Terminal/Log Output.')
+        print('\n -v,             --verbose: Verbose Terminal/Log Output (Resp Lengths).')
         print('\n -q,             --quiet: Minimal Terminal Output.')
         print('\n -nl,            --no-lolcat: '
-            'Disables lolcat Output (Linux only).')
+            'Disables Lolcat Banner (Linux only).')
         print('\n -nc,            --no-color: Disables Colored Output.')
         print('\n -ic <codes>,    --ignore-codes: List of Status Codes to Exclude.')
+        print('\n -fl <lengths>,  --filter-lengths: List of Response Lengths to Ignore.')
     else:
         print(colored('\n Zen',rngColor(),attrs=['bold'])
             +colored('Buster',rngColor(),attrs=['bold'])
@@ -383,15 +384,15 @@ def zenHelp() -> None:
         print(colored('\n -v',rngColor())
             +',             '
             +colored('--verbose',rngColor())
-            +': Verbose Terminal/Log Output.')
+            +': Verbose Terminal/Log Output (Resp Lengths).')
         print(colored('\n -q',rngColor())
             +',             '
             +colored('--quiet',rngColor())
-            +': Minimal Terminal Output')
+            +': Minimal Terminal Output.')
         print(colored('\n -nl',rngColor())
             +',            '
             +colored('--no-lolcat',rngColor())
-            +': Disables Rainbow Output (Linux only).')
+            +': Disables Lolcat Banner (Linux only).')
         print(colored('\n -nc',rngColor())
             +',            '
             +colored('--no-color',rngColor())
@@ -400,6 +401,10 @@ def zenHelp() -> None:
             +colored(' <codes>',rngColor())
             +',    '+colored('--ignore-codes',rngColor())
             +': List of Status Codes to Exclude.')
+        print(colored('\n -fl',rngColor())
+            +colored(' <lengths>,',rngColor())
+            +colored('  --filter-lengths',rngColor())
+            +': List of Response Lengths to Ignore.')
     die(0)
 
 
@@ -441,6 +446,7 @@ extensions = []
 nested_dir = None
 log_filename = None
 excluded_codes = []
+filtered_lengths = []
 for i in range(1,len(args)):
 
     if args[i].lower() == '-x' or args[i].lower() == '--ext':
@@ -539,6 +545,25 @@ for i in range(1,len(args)):
                 # Remove NaN entries, duplicates, and empty strings.
                 excluded_codes = [''.join(n for n in x if n.isdigit()) for x in excluded_codes]
                 excluded_codes = [int(z) for z in set(excluded_codes) if z != '']
+    elif args[i].lower() == '-fl' or args[i].lower() == '--filter-lengths':
+        if i == (len(args)-1) or args[i+1].startswith('-'):
+            pass
+        else:
+            filtered_lengths = args[i+1].split(',')
+            try:
+                for c in range(i+2, len(args)):
+                    if args[c].startswith('-'):
+                        break
+                    elif not args[c].endswith(','):
+                        filtered_lengths.append(args[c])
+                        break
+                    else:
+                        filtered_lengths.append(args[c].replace(',',''))
+            except:
+                pass
+            finally:
+                filtered_lengths = [''.join(n for n in x if n.isdigit()) for x in set(filtered_lengths)]
+                filtered_lengths = [z for z in filtered_lengths if z != '']
 
 
 # Prevent misuse of extensions arg from breaking program logic further down..
@@ -815,11 +840,11 @@ def enumSubdomains(enumerator:str) -> None:
     except:
         return
     else:
-        if r.status_code in ignored_codes:
+        r_length = str(len(r.content))
+        if r.status_code in ignored_codes or r_length in filtered_lengths:
             return
         else:
             with lock:
-                r_length = str(len(r.content))
                 if r.history:
                     r.status_code = r.history[0].status_code
                 if not state['quiet']:
@@ -868,17 +893,17 @@ def enumDirectories(enumerator:str) -> None:
     except:
         pass # Pass here instead of return so our extensions loop below still runs if applicable
     else:
-        if r.status_code in ignored_codes:
+        r_length = str(len(r.content))
+        if r.status_code in ignored_codes or r_length in filtered_lengths:
             pass
         else:
             with lock:
                 if not state['quiet']:
-                    r_length = str(len(r.content))
                     enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","").replace(f":{port}","")
                     location_item = r.url.split("//")[1].replace(f"{host}","").replace(f":{port}","")
                     if state['no_color']:
                         if r.history:
-                            print('[+]Endpoint Found: ',end='')
+                            print(' [+]Endpoint Found: ',end='')
                             print(f'{enum_item_fmt} '
                                 f'{f"[{r_length}] " if verbose else ""}'
                                 f'({r.history[0].status_code}) ->',end='')
@@ -936,17 +961,17 @@ def enumDirectories(enumerator:str) -> None:
             except:
                 return # Now we can return, there's nothing else to do.
             else:
-                if r.status_code in ignored_codes:
+                r_length = str(len(r.content))
+                if r.status_code in ignored_codes or r_length in filtered_lengths:
                     return
                 else:
                     with lock:
                         if not state['quiet']:
-                            r_length = str(len(r.content))
                             enum_item_fmt =  enum_item.split("//")[1].replace(f"{host}","").replace(f":{port}","")
                             location_item = r.url.split("//")[1].replace(f"{host}","").replace(f":{port}","")
                             if state['no_color']:
                                 if r.history:
-                                    print('[+]Endpoint Found: ',end='')
+                                    print(' [+]Endpoint Found: ',end='')
                                     print(f'{enum_item_fmt}.{ext} '
                                         f'{f"[{r_length}] " if verbose else ""}'
                                         f'({r.history[0].status_code}) '
@@ -1119,7 +1144,8 @@ def zenBuster() -> None:
                 f'{" Port: "+port if port != None else ""}\n'
                 f'{" Ignoring Status Codes: 5xx" if state["verbose"] else ""}'
                 f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")]) if state["verbose"] else ""}'
-                '\n')
+                f'\n{" Ignoring Response Lengths: " if (state["verbose"] and filtered_lengths) else ""}'
+                f'{",".join([l for l in filtered_lengths]) if state["verbose"] and filtered_lengths else ""}\n')
         else:
             print(colored('\n Enumerating',rngColor())
                 +colored(f' {"Directories" if state["directory_mode"] else "Subdomains"}',
@@ -1127,11 +1153,15 @@ def zenBuster() -> None:
                 +' for: '
                 +colored(f'{host+nested_dir if state["nested"] else host}',
                 rngColor())
-                +colored(f'{" Port: "+port if port != None else ""}',rngColor())+'\n'
+                +colored(f'{" Port: " if port != None else ""}',rngColor())
+                +f'{port if port != None else ""}'
+                +'\n'
                 +colored(f' {"Ignoring Status Codes: " if state["verbose"] else ""}', 'red')
                 +f'{"5xx" if state["verbose"] else ""}'
                 f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")]) if state["verbose"] else ""}'
-                '\n')
+                +colored(f'\n{" Ignoring Response Lengths: " if state["verbose"] and filtered_lengths else ""}',rngColor())
+                +f'{",".join([l for l in filtered_lengths]) if state["verbose"] and filtered_lengths else ""}'
+                +'\n')
 
         with ThreadPoolExecutor() as executor:
             try:
