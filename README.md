@@ -58,9 +58,14 @@ Modifications were made by me, when specified with: '*zg*'.
 
 # Showcase
 
-![ZenBuster](https://i.imgur.com/tJgNB0S.png "ZenBuster Help Page")
+**Help Page:**<br>
+![ZenBuster](https://i.imgur.com/ilfRpO9.png "ZenBuster Help Page")
 
-More to come...
+**Directory Enumeration Mode:**<br>
+![ZenBuster](https://i.imgur.com/NDv7Fig.png "ZenBuster Directory Mode")
+
+**Subdomain Enumeration Mode:**<br>
+![ZenBuster](https://i.imgur.com/0Dt0tPd.png "ZenBuster Subdomain Mode")
 
 ---
 
@@ -70,7 +75,7 @@ Firstly, ensure that Python version **>=** 3.6 is installed, then clone the repo
 
 `git clone https://github.com/0xTas/zenbuster.git`
 
-Next, `cd zenbuster`.
+Next, `cd zenbuster` and, if on Linux: `chmod +x zenbuster.py`.
 
 ### Dependencies
 
@@ -117,6 +122,7 @@ Short Flag    |Long Flag    |Purpose
 -nc           |--no-color   |Disables colored terminal output
 -nl           |--no-lolcat  |Disables lolcat-printed banner (Linux only)
 -ic \<codes\> |--ignore-codes |List of status codes to exclude from results.
+-fl \<lengths\> |--filter-lengths |List of Response Lengths to Ignore.
 -u \<hostname\> |--host     |Host to target for the scan
 -w \<wordlist\> |--wordlist |Path to wordlist/dictionary file
 -x \<exts\>     |--ext      |Comma-separated list of file extensions (Dirs only)
@@ -155,13 +161,14 @@ Updating ZenBuster is easy! Just move into the installation folder (`cd zenbuste
 
 - Enumerating long endpoints may result in ugly terminal output due to line-wraping on smaller console windows. *Logging to a file is recommended, especially on Windows.*
 - If target host is a vHost on a shared webserver, enumeration via IP may not function as expected. *Use domain/hostname instead.*
+- Ignoring redirect status codes (3xx) with *-ic* doesn't work if the status code at the end of the redirect's path isn't also ignored.
 
 ---
 
 # Version
 <p align="center">
     <a href="https://github.com/0xtas/zenbuster">
-        <img alt="ZenBuster Version" src="https://img.shields.io/badge/Version-1.2-blue"></a>
+        <img alt="ZenBuster Version" src="https://img.shields.io/badge/Version-1.3-blue"></a>
 </p>
 
-**ZenBuster is currently at version 1.2**
+**ZenBuster is currently at version 1.3**
