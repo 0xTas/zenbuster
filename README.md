@@ -151,7 +151,7 @@ Updating ZenBuster is easy! Just move into the installation folder (`cd zenbuste
 - Allow optional throttling of task thread-count.
 - ~~Allow users to modify the list of ignored status codes.~~ **DONE.**
 - Allow greater user control over various request headers.
-- Allow optional ignoring of responses based on content-length.
+- ~~Allow optional ignoring of responses based on content-length.~~ **DONE.**
 - Expand subdomain enumeration to include OSINT methods instead of just brute-forcing.
 - Explore a more comprehensive and source-readable solution to fancy colored output (possibly using [rich](https://pypi.org/project/rich/)).
 
