@@ -1142,10 +1142,10 @@ def zenBuster() -> None:
                 f'{"Directories" if state["directory_mode"] else "Subdomains"}'
                 f' for {host+nested_dir if state["nested"] else host} '
                 f'{" Port: "+port if port != None else ""}\n'
-                f'{" Ignoring Status Codes: 5xx" if state["verbose"] else ""}'
-                f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")]) if state["verbose"] else ""}'
-                f'\n{" Ignoring Response Lengths: " if (state["verbose"] and filtered_lengths) else ""}'
-                f'{",".join([l for l in filtered_lengths]) if state["verbose"] and filtered_lengths else ""}\n')
+                f'{" Ignoring Status Codes: (5xx" if state["verbose"] else ""}'
+                f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")])+")" if state["verbose"] else ""}'
+                f'\n{" Ignoring Response Lengths: [" if (state["verbose"] and filtered_lengths) else ""}'
+                f'{",".join([l for l in filtered_lengths])+"]" if state["verbose"] and filtered_lengths else ""}\n')
         else:
             print(colored('\n Enumerating',rngColor())
                 +colored(f' {"Directories" if state["directory_mode"] else "Subdomains"}',
@@ -1157,10 +1157,10 @@ def zenBuster() -> None:
                 +f'{port if port != None else ""}'
                 +'\n'
                 +colored(f' {"Ignoring Status Codes: " if state["verbose"] else ""}', 'red')
-                +f'{"5xx" if state["verbose"] else ""}'
-                f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")]) if state["verbose"] else ""}'
+                +f'{"(5xx" if state["verbose"] else ""}'
+                f'{","+ ",".join([c for c in map(str,ignored_codes) if not c.startswith("5")])+")" if state["verbose"] else ""}'
                 +colored(f'\n{" Ignoring Response Lengths: " if state["verbose"] and filtered_lengths else ""}',rngColor())
-                +f'{",".join([l for l in filtered_lengths]) if state["verbose"] and filtered_lengths else ""}'
+                +f'{"["+",".join([l for l in filtered_lengths])+"]" if state["verbose"] and filtered_lengths else ""}'
                 +'\n')
 
         with ThreadPoolExecutor() as executor:
