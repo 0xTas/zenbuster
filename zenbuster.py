@@ -213,7 +213,7 @@ if platform.system() == 'Windows' and not state['no_color']:
         if cont.lower() == 'y': 
             try:
                 import subprocess
-                subprocess.call(['python3','-m','pip','install','colorama'])
+                subprocess.call(['python','-m','pip','install','colorama'])
                 from site import getusersitepackages
 
                 user_site = getusersitepackages()
@@ -293,7 +293,10 @@ def validateHost(hostname: str) -> bool:
             else:
                 host = hostname
         elif hostname.replace('.','').isnumeric():
-            host = socket.gethostbyaddr(host)[0]
+            if state['directory_mode']:
+                host = hostname
+            else:
+                host = socket.gethostbyaddr(host)[0]
             if len(parts) > 1 and state['directory_mode']:
                 state['nested'] = True
                 nested_dir = '/'+'/'.join(parts[1:])
