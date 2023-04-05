@@ -29,7 +29,7 @@ Personally, I have been using it to help me solve CTF challenges on platforms li
     6. Color can be disabled for less distracting output with *-nc* / *-nl*.
     7. Add to the list of http status codes to ignore (default 5xx, 404) with *-ic*.
     8. Ignore specific response content-lengths with *-fl*.
-    9. **Tested on Python versions 3.9 and 3.10, with theoretical support for versions >= 3.6**
+    9. **Tested on Python versions 3.10 and 3.11, with theoretical support for versions >= 3.6**
 
 
 ## CAUTION/DISCLAIMER
